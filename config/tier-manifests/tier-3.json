@@ -1,0 +1,37 @@
+{
+  "tier": 3,
+  "name": "Specialist Bench",
+  "description": "6 specialist subagents + domain modes. For complex multi-domain work. Adversarial roles (architecture-critic, red-team) run via the local Gemini CLI — see ADR-012.",
+  "extends": "tier-2",
+  "files": {
+    "global": [
+      { "from": "agents/performance-engineer.md", "to": "~/.claude/agents/performance-engineer.md" },
+      { "from": "agents/data-engineer.md", "to": "~/.claude/agents/data-engineer.md" },
+      { "from": "agents/integration-specialist.md", "to": "~/.claude/agents/integration-specialist.md" },
+      { "from": "agents/incident-commander.md", "to": "~/.claude/agents/incident-commander.md" },
+      { "from": "agents/architecture-critic.md", "to": "~/.claude/agents/architecture-critic.md" },
+      { "from": "agents/accessibility-auditor.md", "to": "~/.claude/agents/accessibility-auditor.md" },
+      { "from": "config/domain-modes.json", "to": "~/.claude/config/domain-modes.json" }
+    ]
+  },
+  "requirements": [
+    { "type": "command", "name": "gemini" },
+    { "type": "command", "name": "codex" }
+  ],
+  "smoke_tests": [
+    "test -f ~/.claude/agents/performance-engineer.md",
+    "test -f ~/.claude/agents/data-engineer.md",
+    "test -f ~/.claude/agents/integration-specialist.md",
+    "test -f ~/.claude/agents/incident-commander.md",
+    "test -f ~/.claude/agents/architecture-critic.md",
+    "test -f ~/.claude/agents/accessibility-auditor.md",
+    "test -f ~/.claude/config/domain-modes.json",
+    "command -v gemini",
+    "command -v codex"
+  ],
+  "notes": {
+    "gemini_requirement": "Artifact 4's tier-3 manifest required Keychain item `google-ai-api-key` and `openai-api-key-gpt5`. Per ADR-011 (Codex) and ADR-012 (Gemini), OpenAI- and Gemini-family work routes through the local CLIs instead — requirements are `command: codex` and `command: gemini`.",
+    "domain_modes_path": "domain-modes.json installs to ~/.claude/config/domain-modes.json (the /domain-mode skill reads it from there). Artifact 4's manifest said ~/.claude/domain-modes.json — corrected for consistency with the skill and the other config files.",
+    "prompt_caching": "config/prompt-caching.json is installed at Tier 2 (tier-3 extends tier-2); not re-listed here."
+  }
+}

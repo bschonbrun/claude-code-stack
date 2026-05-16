@@ -44,20 +44,14 @@
       "pricing_note": "the maintainered via the Codex CLI account, not the stack's API metering. Codex calls are not metered into cost_log.",
       "notes": "v1.1.1 adaptation: the stack reaches the OpenAI / GPT-5.5 family through the locally-installed, authenticated Codex CLI rather than a direct OpenAI API key. Claude Code cannot run subagents on non-Claude models, so adversarial roles (reviewer, product-critic, security-auditor) run on a Claude model and orchestrate Codex via bash. Replaces the artifacts' `openai` provider block. See ADR-011."
     },
-    "google": {
-      "api_key_keychain": "google-ai-studio-api-key",
-      "base_url": "https://generativelanguage.googleapis.com",
-      "models": {
-        "gemini-2.5-pro": {
-          "api_model_id": "gemini-2.5-pro",
-          "context_window": 1000000,
-          "supports_caching": true,
-          "pricing_per_million_input": 1.25,
-          "pricing_per_million_output": 10.00,
-          "pricing_verified_date": "2026-05-15",
-          "notes": "Gemini 3.1 Pro (2M context) is available — consider migration in next /model-audit. Tier 3 provider; no Google key configured as of 2026-05-16."
-        }
-      }
+    "gemini": {
+      "invocation": "local Gemini CLI — `gemini -p \"<prompt>\"` (non-interactive); run from repo root for whole-repo context",
+      "auth": "~/.gemini/ (Gemini CLI login — NOT a Keychain item)",
+      "cli_version_verified": "0.42.0 (2026-05-16)",
+      "underlying_model": "gemini-2.5-pro family (Gemini, accessed via the Gemini CLI; CLI selects model, override with -m)",
+      "supports_caching": false,
+      "pricing_note": "the maintainered via the Gemini CLI account, not the stack's API metering. Gemini calls are not metered into cost_log.",
+      "notes": "v1.1.1 adaptation: the stack reaches the Gemini family through the locally-installed, authenticated Gemini CLI rather than a direct Google AI Studio API key. Claude Code cannot run subagents on non-Claude models, so Gemini roles (architecture-critic, red-team, historian) run on a Claude model and orchestrate the Gemini CLI via bash. Replaces the artifacts' API-key `google` provider block. See ADR-012."
     },
     "ollama": {
       "base_url": "http://localhost:11434",
@@ -79,26 +73,26 @@
     "ops": { "primary": "anthropic/claude-haiku-4-5-20251001", "escalation": "anthropic/claude-sonnet-4-6" },
     "product-critic": { "primary": "codex/gpt-5.5", "orchestrated_by": "anthropic/claude-sonnet-4-6", "notes": "v1.1.1: product critique via local Codex CLI — see ADR-011." },
     "designer": { "primary": "anthropic/claude-opus-4-7" },
-    "red-team": { "primary": "google/gemini-2.5-pro", "notes": "Tier 3 provider. Same Claude-Code-cannot-run-non-Claude-subagents issue as the Codex roles; Gemini integration unresolved as of Tier 2 — to be addressed in Session 5 (Tier 3)." },
+    "red-team": { "primary": "gemini/gemini-2.5-pro", "orchestrated_by": "anthropic/claude-sonnet-4-6", "notes": "v1.1.1: red-team analysis via local Gemini CLI — see ADR-012." },
     "security-auditor": { "primary": "codex/gpt-5.5", "second_pass": "anthropic/claude-opus-4-7", "orchestrated_by": "anthropic/claude-sonnet-4-6", "notes": "v1.1.1: primary audit via local Codex CLI; belt-and-suspenders Opus second pass on novel crypto/auth — see ADR-011." },
     "performance-engineer": { "primary": "anthropic/claude-opus-4-7" },
     "data-engineer": { "primary": "anthropic/claude-opus-4-7" },
     "integration-specialist": { "primary": "anthropic/claude-sonnet-4-6" },
     "incident-commander": { "primary": "anthropic/claude-opus-4-7" },
-    "architecture-critic": { "primary": "google/gemini-2.5-pro" },
+    "architecture-critic": { "primary": "gemini/gemini-2.5-pro", "orchestrated_by": "anthropic/claude-sonnet-4-6", "notes": "v1.1.1: whole-repo architectural critique via local Gemini CLI — see ADR-012." },
     "accessibility-auditor": { "primary": "anthropic/claude-sonnet-4-6" },
-    "historian": { "primary": "google/gemini-2.5-pro" },
+    "historian": { "primary": "gemini/gemini-2.5-pro", "orchestrated_by": "anthropic/claude-sonnet-4-6", "notes": "v1.1.1: long-context history review via local Gemini CLI — see ADR-012. Tier 4 subagent." },
     "librarian": { "primary": "anthropic/claude-haiku-4-5-20251001" },
     "estimator": { "primary": "anthropic/claude-sonnet-4-6" },
     "foreman-team-lead": { "primary": "anthropic/claude-opus-4-7", "notes": "v1.1: Used in agent-teams orchestration mode only. Main-thread mode uses foreman as a skill — no subagent invocation." },
     "local-ops": { "primary": "ollama/qwen-2.5-coder-7b" }
   },
   "notes": [
-    "v1.1.1 change: OpenAI/GPT-5.5-family work routes through the local Codex CLI (provider `codex`), not a direct OpenAI API key. reviewer, product-critic, security-auditor run on a Claude model and orchestrate Codex. See ADR-011.",
+    "v1.1.1 change: OpenAI/GPT-5.5-family work routes through the local Codex CLI (provider `codex`); Gemini-family work routes through the local Gemini CLI (provider `gemini`). Neither uses a direct API key. Adversarial roles run on a Claude model and orchestrate the respective CLI. See ADR-011 (Codex) and ADR-012 (Gemini).",
     "v1.1 change: Foreman is a skill (skills/foreman/SKILL.md) in main-thread orchestration mode. Only in agent-teams mode is foreman a separate session (team-lead role).",
-    "Pricing verified against vendor docs on 2026-05-15. Anthropic: platform.claude.com. Google: ai.google.dev. Apr 2026 friction was a 3.4x cost underforecast — verify live before any cost-sensitive operation.",
+    "Pricing verified against vendor docs on 2026-05-15. Anthropic: platform.claude.com. Apr 2026 friction was a 3.4x cost underforecast — verify live before any cost-sensitive operation.",
     "/model-audit skill (Tier 4) re-verifies monthly and proposes changes.",
-    "red-team and architecture-critic and historian use Gemini 2.5 Pro. No Google key is configured as of 2026-05-16; Gemini integration is a Tier 3 (Session 5) decision.",
-    "Gemini 3.1 Pro (2M context, released Feb 2026) is a migration candidate for architecture-critic, historian. Flagged for next /model-audit."
+    "Codex and Gemini calls are billed via their own CLI accounts and are NOT metered into cost_log — Tier 4 cost reporting does not see adversarial-review / red-team / architecture-critic / historian spend.",
+    "Gemini 3.1 Pro (2M context, released Feb 2026) — the Gemini CLI selects its own model; revisit the -m override in the next /model-audit."
   ]
 }
