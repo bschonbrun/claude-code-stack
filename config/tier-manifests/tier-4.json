@@ -1,0 +1,34 @@
+{
+  "tier": 4,
+  "name": "Self-Improving",
+  "description": "3 meta subagents + monthly model + perf audits. Requires 30 days of subagent_runs data to be meaningful.",
+  "extends": "tier-3",
+  "files": {
+    "global": [
+      { "from": "agents/historian.md", "to": "~/.claude/agents/historian.md" },
+      { "from": "agents/librarian.md", "to": "~/.claude/agents/librarian.md" },
+      { "from": "agents/estimator.md", "to": "~/.claude/agents/estimator.md" },
+      { "from": "skills/model-audit/SKILL.md", "to": "~/.claude/skills/model-audit/SKILL.md" },
+      { "from": "skills/agent-performance-review/SKILL.md", "to": "~/.claude/skills/agent-performance-review/SKILL.md" }
+    ],
+    "schemas": [
+      { "from": "schemas/002-subagent-runs.sql", "apply_to_supabase": true },
+      { "from": "schemas/003-model-audits.sql", "apply_to_supabase": true }
+    ]
+  },
+  "requirements": [
+    { "type": "supabase_project", "name": "<your-supabase-ref>" }
+  ],
+  "smoke_tests": [
+    "test -f ~/.claude/agents/historian.md",
+    "test -f ~/.claude/agents/librarian.md",
+    "test -f ~/.claude/agents/estimator.md",
+    "test -f ~/.claude/skills/model-audit/SKILL.md",
+    "test -f ~/.claude/skills/agent-performance-review/SKILL.md"
+  ],
+  "notes": {
+    "smoke_tests": "Artifact 4's tier-4 manifest included `psql_check_table_exists` smoke tests — that is not a real shell command and verify.sh runs smoke tests via eval, so it would fail. Dropped here; Supabase table creation is verified separately via the Supabase MCP at install time (see Tier 4 install log).",
+    "schema_location": "002/003 create tables in the `stack` schema (stack.subagent_runs, stack.model_audits) for consistency with 001-cost-log.sql — Artifact 4 used bare public-schema names."
+  },
+  "post_install_note": "Tier 4 skills (model-audit, agent-performance-review) need ~30 days of cost_log and subagent_runs data to produce meaningful output. Set a calendar reminder for first run."
+}
