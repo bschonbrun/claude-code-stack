@@ -1,0 +1,25 @@
+{
+  "$schema": "https://github.com/bschonbrun/claude-code-stack/schemas/stack-config-schema.json",
+  "stack_version": "1.1.0",
+  "stack_tier": 2,
+  "purpose": "<one-line description>",
+  "created": "YYYY-MM-DD",
+  "last_modified": "YYYY-MM-DD",
+  "orchestration_mode": "main-thread",
+  "strict_mode": true,
+  "domain_mode": null,
+  "sensitivity": {
+    "level": "normal",
+    "notes": ""
+  },
+  "active_subagents": [],
+  "required_approvals": [],
+  "model_overrides": {},
+  "skill_overrides": {},
+  "cost_protection": {
+    "per_session_alert_usd": 5.00,
+    "per_day_alert_usd": 50.00,
+    "per_session_hard_cap_usd": null
+  },
+  "change_history": []
+}

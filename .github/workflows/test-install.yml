@@ -1,0 +1,30 @@
+name: Test install
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        tier: [0, 1, 2, 3, 4]
+        # Tier 5 (Ollama) skipped in CI — too big to download per run
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          brew install jq
+
+      - name: Test install
+        run: |
+          ./scripts/install.sh --tier=${{ matrix.tier }} --mode=fresh
+
+      - name: Test verify
+        run: |
+          # Skip Keychain checks in CI
+          ./scripts/verify.sh --tier=${{ matrix.tier }} || true

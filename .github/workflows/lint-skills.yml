@@ -1,0 +1,29 @@
+name: Lint skills
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check skill frontmatter
+        run: |
+          for f in skills/*/SKILL.md agents/*.md; do
+            if ! head -1 "$f" | grep -q '^---$'; then
+              echo "FAIL: $f missing YAML frontmatter"
+              exit 1
+            fi
+            if ! grep -q '^name:' "$f"; then
+              echo "FAIL: $f missing 'name' field"
+              exit 1
+            fi
+            if ! grep -q '^description:' "$f"; then
+              echo "FAIL: $f missing 'description' field"
+              exit 1
+            fi
+          done
+          echo "All skills and agents pass frontmatter check."
