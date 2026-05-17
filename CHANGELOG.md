@@ -4,6 +4,33 @@ All notable changes to the Claude Code Stack are documented here. Format follows
 
 ## [Unreleased]
 
+## [1.1.3] — 2026-05-17
+
+### Added
+- `--skip-requirements` flag on `install.sh` — downgrades missing-command /
+  missing-Keychain checks to warnings. Lets CI test install mechanics for
+  every tier without the external tools (`codex`, `gemini`) the tiers expect.
+- Project templates (`PROJECT-CLAUDE`, `PROJECT-ONBOARDING`, `PROJECT-README`)
+  now install to `~/.claude/templates/` at Tier 0, so `/project-init` (Tier 1)
+  can actually find them.
+
+### Changed
+- `stack_version` bumped to `1.1.3` in `stack-config` / `stack-defaults`
+  templates and the `project-init` skill.
+- `project-init` skill: completed the previously dangling step 6 (CLAUDE.md
+  scaffold, docs/ tree, `.gitignore`, suggested commit); step 1 now runs
+  `git init` after a single confirmation when the directory is not a repo.
+- Tier-0 manifest installs all doc templates; Tier-2 manifest no longer
+  redundantly re-installs the ADR/RUNBOOK templates (Tier 2 extends Tier 0).
+
+### Fixed
+- CI `test-install.yml` was failing on Tiers 2–4 (`requirement-fail: codex`).
+  The workflow now installs with `--skip-requirements`.
+- Removed dead `docs/MODEL-STRATEGY.md` link from README — pointed at
+  `config/model-routing.json` + ADR-004 instead.
+- Deleted duplicate `config/claude.md.repo.template` (byte-identical to
+  `templates/PROJECT-CLAUDE.md.template`, which is now canonical).
+
 ## [1.1.2] — 2026-05-17
 
 ### Added

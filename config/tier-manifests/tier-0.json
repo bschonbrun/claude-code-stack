@@ -13,9 +13,13 @@
       { "from": "skills/goodmorning/SKILL.md", "to": "~/.claude/skills/goodmorning/SKILL.md" },
       { "from": "skills/operating/SKILL.md", "to": "~/.claude/skills/operating/SKILL.md" },
       { "from": "schemas/stack-config-schema.json", "to": "~/.claude/schemas/stack-config-schema.json" },
-      { "from": "schemas/stack-defaults-schema.json", "to": "~/.claude/schemas/stack-defaults-schema.json" }
-    ],
-    "per_repo_template": "config/claude.md.repo.template"
+      { "from": "schemas/stack-defaults-schema.json", "to": "~/.claude/schemas/stack-defaults-schema.json" },
+      { "from": "templates/PROJECT-CLAUDE.md.template", "to": "~/.claude/templates/PROJECT-CLAUDE.md.template" },
+      { "from": "templates/PROJECT-ONBOARDING.md.template", "to": "~/.claude/templates/PROJECT-ONBOARDING.md.template" },
+      { "from": "templates/PROJECT-README.md.template", "to": "~/.claude/templates/PROJECT-README.md.template" },
+      { "from": "templates/ADR.template.md", "to": "~/.claude/templates/ADR.template.md" },
+      { "from": "templates/RUNBOOK.template.md", "to": "~/.claude/templates/RUNBOOK.template.md" }
+    ]
   },
   "requirements": [],
   "smoke_tests": [
@@ -26,6 +30,10 @@
     "test -x ~/.claude/hooks/bulk-job-reminder.sh",
     "test -f ~/.claude/skills/handoff/SKILL.md",
     "test -f ~/.claude/skills/goodmorning/SKILL.md",
-    "test -f ~/.claude/skills/operating/SKILL.md"
+    "test -f ~/.claude/skills/operating/SKILL.md",
+    "test -f ~/.claude/templates/PROJECT-CLAUDE.md.template",
+    "test -f ~/.claude/templates/PROJECT-ONBOARDING.md.template",
+    "test -f ~/.claude/templates/ADR.template.md",
+    "test -f ~/.claude/templates/RUNBOOK.template.md"
   ]
 }

@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 # Claude Code Stack — Master installer
 # Usage:
-#   ./install.sh --tier=N [--mode=merge|overwrite|fresh] [--include-ollama=laptop]
+#   ./install.sh --tier=N [--mode=merge|overwrite|fresh] [--include-ollama=laptop] [--skip-requirements]
 #
 # Examples:
 #   ./install.sh --tier=0
 #   ./install.sh --tier=5 --include-ollama=laptop
 #   ./install.sh --tier=2 --mode=fresh
+#
+# --skip-requirements downgrades missing-command / missing-Keychain checks to
+# warnings instead of hard failures. Intended for CI, which tests install
+# mechanics without the external tools (codex, gemini) the tiers expect.
 
 set -euo pipefail
 
@@ -14,6 +18,7 @@ set -euo pipefail
 TIER=""
 MODE="merge"
 INCLUDE_OLLAMA=""
+export SKIP_REQUIREMENTS=""
 
 # Parse args
 for arg in "$@"; do
@@ -21,7 +26,8 @@ for arg in "$@"; do
     --tier=*) TIER="${arg#*=}" ;;
     --mode=*) MODE="${arg#*=}" ;;
     --include-ollama=*) INCLUDE_OLLAMA="${arg#*=}" ;;
-    --help) echo "Usage: $0 --tier=N [--mode=merge|overwrite|fresh] [--include-ollama=laptop]"; exit 0 ;;
+    --skip-requirements) SKIP_REQUIREMENTS="1" ;;
+    --help) echo "Usage: $0 --tier=N [--mode=merge|overwrite|fresh] [--include-ollama=laptop] [--skip-requirements]"; exit 0 ;;
     *) echo "Unknown arg: $arg"; exit 1 ;;
   esac
 done

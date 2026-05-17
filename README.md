@@ -36,7 +36,7 @@ Each tier is fully functional standalone. See `docs/INSTALL.md` for details.
 - `docs/PHILOSOPHY.md` — why this exists, what it optimizes for
 - `docs/ARCHITECTURE.md` — system architecture
 - `docs/ROUTING.md` — hook vs skill vs CLAUDE.md decision rule
-- `docs/MODEL-STRATEGY.md` — which model does what and why
+- `config/model-routing.json` — which model does what and why (rationale in `docs/ADRs/004-multi-provider-strategy.md`)
 - `docs/HARDWARE.md` — laptop sizing for Tier 5
 - `docs/PROVIDERS.md` — API setup per provider
 - `docs/ADRs/` — architecture decision records

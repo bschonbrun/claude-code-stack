@@ -12,7 +12,11 @@ Two-mode project initialization. v1.1.
 ### 1. Detect existing state
 - Check for `.claude/stack-config.json`. If present, ask if user wants to update (don't blindly overwrite).
 - Check for `CLAUDE.md` at root. If present, note it.
-- Check for `.git/`. If absent, ask if user wants to `git init`.
+- Check for a git repo: `git rev-parse --is-inside-work-tree`. If it returns
+  false / errors (not a repo), ask once: "This isn't a git repo. Initialize
+  one here? (yes/no)". If yes, run `git init`. If no, continue — but warn that
+  `/handoff`, `/goodmorning`, and foreman features that read git state will be
+  limited.
 - Read `~/.claude/stack-defaults.json` for the user's personal defaults.
 
 ### 2. Ask which mode
@@ -73,7 +77,7 @@ Then ask: "Should this also become your default for new projects?"
 
 ```json
 {
-  "stack_version": "1.1.0",
+  "stack_version": "1.1.3",
   "stack_tier": <chosen>,
   "purpose": "<one-line>",
   "created": "<YYYY-MM-DD>",
@@ -128,4 +132,38 @@ Example entry after `/strict-mode off` with reason "quick prototype, not worth t
 The librarian subagent (Tier 4) reads change_history across projects to spot patterns ("user overrides this 60% of the time — maybe the default is wrong"). The "show me my recent overrides" option in safety-change flows queries this same data.
 
 ### 6. Scaffold CLAUDE.md, ensure directories, update .gitignore, suggest commit
-(Same as v1.0; see prior section of this artifact.)
+
+**Scaffold the project CLAUDE.md.** If no root `CLAUDE.md` exists, copy
+`~/.claude/templates/PROJECT-CLAUDE.md.template` to `./CLAUDE.md` and fill in
+the repo name, tier, and one-line purpose from the answers above. Leave the
+`<...>` placeholder sections for the user to complete. If a `CLAUDE.md`
+already exists, do not overwrite it — note that it should be reconciled with
+the template by hand.
+
+**Ensure the docs directory tree.** Create any missing:
+- `docs/ADRs/` — copy `~/.claude/templates/ADR.template.md` to
+  `docs/ADRs/000-template.md` if absent.
+- `docs/runbooks/` — copy `RUNBOOK.template.md` to `docs/runbooks/000-template.md`
+  if absent.
+- `docs/handoffs/` — the `/handoff` skill archives here.
+- `docs/architecture/` — for `data-flow.md` and similar.
+
+**Scaffold ONBOARDING.md.** If `docs/ONBOARDING.md` is absent, copy
+`~/.claude/templates/PROJECT-ONBOARDING.md.template` to it.
+
+**Update `.gitignore`.** Ensure these entries are present (append if missing):
+```
+.DS_Store
+.claude/scratch/
+.claude/worktrees/
+.claude/cost-projections/
+```
+
+**Suggest the commit.** Do not commit automatically. Print the suggested
+command for the user to run:
+```
+git add .claude/stack-config.json CLAUDE.md docs/ .gitignore
+git commit -m "chore: stack init at tier <N>"
+```
+
+After this, foreman is unlocked for the project (strict mode satisfied).

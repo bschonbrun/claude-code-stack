@@ -67,15 +67,23 @@ check_tier_requirements() {
     case "$type" in
       keychain_item)
         if ! security find-generic-password -s "$name" > /dev/null 2>&1; then
-          echo "    [requirement-fail] Keychain item missing: $name"
-          echo "    Add with: security add-generic-password -s '$name' -a \"\$USER\" -w '<value>' -U"
-          return 1
+          if [[ -n "${SKIP_REQUIREMENTS:-}" ]]; then
+            echo "    [requirement-skip] Keychain item missing: $name"
+          else
+            echo "    [requirement-fail] Keychain item missing: $name"
+            echo "    Add with: security add-generic-password -s '$name' -a \"\$USER\" -w '<value>' -U"
+            return 1
+          fi
         fi
         ;;
       command)
         if ! command -v "$name" > /dev/null 2>&1; then
-          echo "    [requirement-fail] Command missing: $name"
-          return 1
+          if [[ -n "${SKIP_REQUIREMENTS:-}" ]]; then
+            echo "    [requirement-skip] Command missing: $name"
+          else
+            echo "    [requirement-fail] Command missing: $name"
+            return 1
+          fi
         fi
         ;;
       supabase_project)

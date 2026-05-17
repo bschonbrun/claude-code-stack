@@ -22,7 +22,7 @@ jobs:
 
       - name: Test install
         run: |
-          ./scripts/install.sh --tier=${{ matrix.tier }} --mode=fresh
+          ./scripts/install.sh --tier=${{ matrix.tier }} --mode=fresh --skip-requirements
 
       - name: Test verify
         run: |
