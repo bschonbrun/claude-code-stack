@@ -10,14 +10,19 @@ merge_json() {
   local tmp
   tmp="$(mktemp)"
 
+  # NOTE: jq function arguments are call-by-name filters, not values. The
+  # args MUST be bound to $-variables up front — otherwise the recursive
+  # `deep_merge(a[$k]; b[$k])` re-evaluates `a`/`b` against the reduce
+  # accumulator instead of the original inputs, which fails on nested data.
   jq -s '
     def deep_merge(a; b):
-      if (a | type) == "object" and (b | type) == "object" then
-        reduce ((a + b) | keys[]) as $k ({}; .[$k] = deep_merge(a[$k]; b[$k]))
-      elif (a | type) == "array" and (b | type) == "array" then
-        (a + b) | unique
-      elif b == null then a
-      else b end;
+      a as $a | b as $b |
+      if ($a | type) == "object" and ($b | type) == "object" then
+        reduce (($a + $b) | keys[]) as $k ({}; .[$k] = deep_merge($a[$k]; $b[$k]))
+      elif ($a | type) == "array" and ($b | type) == "array" then
+        ($a + $b) | unique
+      elif $b == null then $a
+      else $b end;
     deep_merge(.[0]; .[1])
   ' "$target" "$source" > "$tmp"
 

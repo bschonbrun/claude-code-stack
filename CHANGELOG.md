@@ -30,6 +30,12 @@ All notable changes to the Claude Code Stack are documented here. Format follows
   `config/model-routing.json` + ADR-004 instead.
 - Deleted duplicate `config/claude.md.repo.template` (byte-identical to
   `templates/PROJECT-CLAUDE.md.template`, which is now canonical).
+- `config-merger.sh` `deep_merge` was broken for nested data: jq function
+  args are call-by-name filters, so the recursion re-evaluated them against
+  the reduce accumulator (`{}[0]` → "cannot index object with number").
+  Never surfaced before because a first install `cp`s settings.json; only
+  a merge-mode re-install onto an existing file hits the path. Args are now
+  bound to `$`-variables. Found re-installing the stack post-1.1.3.
 - foreman skill read the wrong stack-config field name (`approval_gates`);
   the schema, template, and all project configs use `required_approvals`.
   Renamed foreman's read to `required_approvals` so tier approval gates are
