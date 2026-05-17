@@ -4,6 +4,50 @@ All notable changes to the Claude Code Stack are documented here. Format follows
 
 ## [Unreleased]
 
+## [1.1.2] — 2026-05-17
+
+### Added
+- `/operating` skill — on-demand guide for running Claude Code with the stack.
+- `docs/OPERATING.md` — the operating guide (source of truth for `/operating`).
+- Session-start stack blurb in `session-start-handoff.sh`: what the stack is,
+  the key commands, and a pointer to `/operating`.
+- `remoteControlAtStartup: true` default in the Tier-0 global settings template.
+
+### Changed
+- Tier-0 manifest installs and smoke-tests the `/operating` skill.
+
+### Notes
+- Remote Control auto-enable via `remoteControlAtStartup` is currently buggy
+  upstream (anthropics/claude-code#54527, OPEN — the setting does not
+  auto-enable on new sessions). The reliable mechanism today is the shell
+  alias `claude --remote-control`; the template setting is the correct config
+  and becomes a no-op-but-correct default once #54527 lands. The earlier
+  `--remote-control` CLI flag request (#39347) and the config-reset bug
+  (#29929) are both CLOSED.
+
+## [1.1.1] — 2026-05-16
+
+### Changed
+- Corrected model IDs: `llama3.2:8b` → `llama3.1:8b` (Llama 3.2 has no 8B);
+  Haiku IDs given dated form; provider prefixes made consistent across
+  agent definitions and `model-routing.json`.
+- Tier-2 manifest rewritten to the working install format.
+- Schemas `002`/`003` (`subagent_runs`, `model_audits`) placed in the
+  Supabase `stack` schema for consistency with `cost_log`.
+
+### Added
+- Repo-completion pass: ops docs, runbooks, project templates, test suite,
+  `.github/` CI workflows, uninstall + audit-repos scripts.
+- ADR-011 (OpenAI-family review via the local Codex CLI) and ADR-012
+  (Gemini-family review via the local Gemini CLI).
+- `docs/AUDIT-PASS.md` — the retroactive per-repo audit plan.
+
+### Notes
+- The stack was rolled out to all 7 production repos (Tiers 1–5), one PR per
+  repo. Each repo gained `.claude/stack-config.json`, retroactive ADRs,
+  runbooks, `docs/ONBOARDING.md`, and a cross-repo data-flow doc. That
+  rollout is tracked in each repo's `docs/handoffs/`, not here.
+
 ## [1.0.0] — 2026-05-15
 
 ### Added
