@@ -11,6 +11,7 @@
       { "from": "hooks/bulk-job-reminder.sh", "to": "~/.claude/hooks/bulk-job-reminder.sh", "executable": true },
       { "from": "skills/handoff/SKILL.md", "to": "~/.claude/skills/handoff/SKILL.md" },
       { "from": "skills/goodmorning/SKILL.md", "to": "~/.claude/skills/goodmorning/SKILL.md" },
+      { "from": "skills/operating/SKILL.md", "to": "~/.claude/skills/operating/SKILL.md" },
       { "from": "schemas/stack-config-schema.json", "to": "~/.claude/schemas/stack-config-schema.json" },
       { "from": "schemas/stack-defaults-schema.json", "to": "~/.claude/schemas/stack-defaults-schema.json" }
     ],
@@ -24,6 +25,7 @@
     "test -x ~/.claude/hooks/post-tool-tsc.sh",
     "test -x ~/.claude/hooks/bulk-job-reminder.sh",
     "test -f ~/.claude/skills/handoff/SKILL.md",
-    "test -f ~/.claude/skills/goodmorning/SKILL.md"
+    "test -f ~/.claude/skills/goodmorning/SKILL.md",
+    "test -f ~/.claude/skills/operating/SKILL.md"
   ]
 }

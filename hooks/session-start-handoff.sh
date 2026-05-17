@@ -36,3 +36,12 @@ if [[ -f "$HANDOFF" ]]; then
 else
   echo "No handoff from previous session. Run /goodmorning for context, or just start working."
 fi
+
+echo ""
+echo "── Claude Code Stack ──────────────────────────"
+echo "This project runs on the stack: foreman orchestrates, subagents do"
+echo "the work, you approve at gates."
+echo "Key commands: /goodmorning (session start) · /handoff (session end)"
+echo "· /project-init (new project) · /budget-guard (before bulk LLM jobs)"
+echo "Run /operating for the full guide — how this is set up to operate."
+echo "──────────────────────────────────────────────"
