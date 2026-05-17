@@ -98,7 +98,7 @@ fi
 
 # Step 5: Verify
 echo "[5/5] Verifying installation..."
-"$SCRIPT_DIR/verify.sh" --tier="$TIER"
+"$SCRIPT_DIR/verify.sh" --tier="$TIER" ${SKIP_REQUIREMENTS:+--skip-requirements}
 
 echo "==============================================="
 echo "Install complete. Stack tier $TIER is live."

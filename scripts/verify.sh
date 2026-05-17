@@ -1,17 +1,22 @@
 #!/usr/bin/env bash
 # Verify a tier install.
-# Usage: ./verify.sh --tier=N
+# Usage: ./verify.sh --tier=N [--skip-requirements]
+#
+# --skip-requirements treats environmental smoke tests (external commands,
+# Keychain items) as skipped rather than failed. Intended for CI.
 
 set -euo pipefail
 
 TIER=""
+SKIP_REQUIREMENTS=""
 for arg in "$@"; do
   case $arg in
     --tier=*) TIER="${arg#*=}" ;;
+    --skip-requirements) SKIP_REQUIREMENTS="1" ;;
   esac
 done
 
-[[ -z "$TIER" ]] && { echo "Usage: $0 --tier=N"; exit 1; }
+[[ -z "$TIER" ]] && { echo "Usage: $0 --tier=N [--skip-requirements]"; exit 1; }
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -21,6 +26,10 @@ passes=0
 
 run_test() {
   local cmd="$1"
+  if [[ -n "$SKIP_REQUIREMENTS" ]] && [[ "$cmd" == "command -v "* || "$cmd" == *"security find-generic-password"* ]]; then
+    echo "  [SKIP] $cmd"
+    return
+  fi
   if eval "$cmd" > /dev/null 2>&1; then
     echo "  [PASS] $cmd"
     passes=$((passes + 1))

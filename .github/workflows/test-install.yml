@@ -26,5 +26,4 @@ jobs:
 
       - name: Test verify
         run: |
-          # Skip Keychain checks in CI
-          ./scripts/verify.sh --tier=${{ matrix.tier }} || true
+          ./scripts/verify.sh --tier=${{ matrix.tier }} --skip-requirements
