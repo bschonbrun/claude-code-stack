@@ -30,6 +30,12 @@ All notable changes to the Claude Code Stack are documented here. Format follows
   `config/model-routing.json` + ADR-004 instead.
 - Deleted duplicate `config/claude.md.repo.template` (byte-identical to
   `templates/PROJECT-CLAUDE.md.template`, which is now canonical).
+- foreman skill read the wrong stack-config field name (`approval_gates`);
+  the schema, template, and all project configs use `required_approvals`.
+  Renamed foreman's read to `required_approvals` so tier approval gates are
+  actually applied. Also rewrote step 6 so foreman reads
+  `domain-modes.json[domain_mode].approval_gates` and applies the domain
+  review checkpoints — previously they never fired.
 
 ## [1.1.2] — 2026-05-17
 

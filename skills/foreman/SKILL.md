@@ -11,7 +11,7 @@ You orchestrate the team. You don't write code, design, test, or review yourself
 
 1. **Read `.claude/stack-config.json`.**
    - If missing AND project is Tier 2+: **STOP.** Tell user: "This project doesn't have stack-config.json. Run `/project-init` first."
-   - If present, read tier, active_subagents, approval_gates, model_overrides, domain_mode, orchestration_mode.
+   - If present, read tier, active_subagents, required_approvals, model_overrides, domain_mode, orchestration_mode.
 
 2. **Check orchestration mode.**
    - `main-thread` (default): you (the main thread) invoke subagents sequentially. This skill guides which and in what order.
@@ -47,16 +47,37 @@ You orchestrate the team. You don't write code, design, test, or review yourself
 
 5. **Apply project overrides.** If stack-config.json disables a subagent, skip it. If it forces additional gates, add them.
 
-6. **Apply domain modes.**
-   - `financial-code`: forces validator + red-team + security-auditor on any merge.
-   - `schema-migration`: forces dry-run-against-prod-clone before approval; enforces data-engineer + security-auditor.
-   - `deploy`: forces ops pre+post; verifies branch != main without explicit approval.
+6. **Apply domain modes.** If `domain_mode` is set, read its entry in
+   `~/.claude/config/domain-modes.json` and apply:
+   - `required_subagents_for_change` — add these subagents to the team.
+   - `approval_gates` — the domain-mode review checkpoints. Stop and ask the
+     user at each checkpoint as it is reached (e.g. `after_architect`,
+     `after_validator`, `before_merge`, `after_data_engineer`, `before_apply`,
+     `before_deploy`, `after_deploy_verify`, `after_designer_inventory`).
+   - `required_skills`, `validator_must_cross_check`, `require_adr`,
+     `require_rollback_plan` — enforce where present.
 
-7. **Apply approval gates.** Stop and ask user before:
-   - Pre-merge (if in approval_gates)
-   - Pre-deploy (if in approval_gates)
-   - Pre-schema-change (if in approval_gates)
-   - Pre-bulk-job (if in approval_gates)
+   Quick reference (authoritative source is `domain-modes.json`):
+   - `financial-code`: validator + red-team + security-auditor on any merge;
+     validator cross-checks real values.
+   - `schema-migration`: dry-run-against-prod-clone before approval;
+     data-engineer + security-auditor; ADR + rollback plan required.
+   - `deploy`: ops pre+post; verifies branch != main without explicit approval.
+   - `ui-design`: designer inventory before build; `/design-match` before merge.
+   - `data-operation`: `/cost-gate` + `/coverage-snapshot` mandatory.
+
+7. **Apply tier approval gates.** The `required_approvals` field in
+   stack-config.json lists project-specific tier gates (see
+   `~/.claude/config/approval-gates.json`). Stop and ask the user before:
+   - Pre-merge (if `pre-merge` in `required_approvals`)
+   - Pre-deploy (if `pre-deploy` in `required_approvals`)
+   - Pre-schema-change (if `pre-schema-change` in `required_approvals`)
+   - Pre-bulk-job (if `pre-bulk-job` in `required_approvals`)
+
+   An empty `required_approvals` means "use tier defaults" — the gates in
+   `approval-gates.json` are `default_enabled_at_tier: 2`, so at Tier 2+ treat
+   the relevant gates as on. The domain-mode checkpoints from step 6 apply
+   independently of this field.
 
 8. **Review-pass gate (v1.1).** For any task whose primary output is documentation (handoffs, specs, ADR sets, design docs, audit reports): invoke `/review-handoff` BEFORE signaling completion. This applies regardless of orchestration mode. Documenter subagent owns this responsibility.
 
