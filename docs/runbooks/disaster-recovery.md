@@ -12,7 +12,7 @@
 ### Lost laptop
 
 1. Get new laptop, install macOS, Homebrew, Claude Code.
-2. Restore API keys to Keychain (from your records — the maintainer keeps these in 1Password or similar).
+2. Restore API keys to Keychain (from your own records — e.g. a password manager).
 3. Clone stack: `git clone git@github.com:bschonbrun/claude-code-stack.git`.
 4. Install: `./scripts/install.sh --tier=<N>`.
 5. Clone work projects.
