@@ -4,6 +4,15 @@ All notable changes to the Claude Code Stack are documented here. Format follows
 
 ## [Unreleased]
 
+### Added
+- `verify.sh --repo=PATH` — verifies a single repo is correctly onboarded
+  onto the stack: `stack-config.json` exists and is valid JSON, `stack_tier`
+  is 0–5, `stack_version` is set, and `domain_mode` (if any) is a real mode
+  from `config/domain-modes.json`. Soft-warns on missing §11 audit artifacts
+  (ADRs, runbooks, ONBOARDING). Complements `--tier=N`, which only checks
+  the global install — gives the §11 audit a one-command per-repo health
+  check it previously lacked.
+
 ## [1.1.3] — 2026-05-17
 
 ### Added
