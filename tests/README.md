@@ -21,4 +21,6 @@ cd tests
 ./test-merger-interactive.sh
 ```
 
-All tests must pass for a release tag. CI (`.github/workflows/test-install.yml`) runs install + verify across tiers; this unit suite is run manually before release.
+All tests must pass for a release tag. CI runs this whole suite in the
+`unit-tests` job, alongside a per-tier install/verify matrix — see
+`.github/workflows/test-install.yml`.

@@ -83,12 +83,15 @@ append_stack_section() {
   local source="$1"
   local target="$2"
 
-  # Look for stack-managed section marker in target
+  # Look for stack-managed section marker in target. Both markers are
+  # declared up front so the append (else) branch can reference end_marker
+  # too — bash has no block scope, so an in-branch `local` would leave it
+  # unset on the other path (fatal under `set -u`).
   local marker="<!-- CLAUDE_CODE_STACK_MANAGED -->"
+  local end_marker="<!-- /CLAUDE_CODE_STACK_MANAGED -->"
 
   if grep -q "$marker" "$target" 2>/dev/null; then
     # Section exists; replace between marker and end-marker
-    local end_marker="<!-- /CLAUDE_CODE_STACK_MANAGED -->"
     awk -v source="$source" -v marker="$marker" -v end_marker="$end_marker" '
       BEGIN { in_section = 0 }
       $0 ~ marker { in_section = 1; print; while ((getline line < source) > 0) print line; next }

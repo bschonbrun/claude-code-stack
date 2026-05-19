@@ -12,6 +12,10 @@ All notable changes to the Claude Code Stack are documented here. Format follows
   (ADRs, runbooks, ONBOARDING). Complements `--tier=N`, which only checks
   the global install — gives the §11 audit a one-command per-repo health
   check it previously lacked.
+- CI now runs the full `tests/` suite in a `unit-tests` job
+  (`test-install.yml`). Previously only the per-tier install/verify matrix
+  ran — the merger, conflict, and tier-isolation tests were never exercised
+  in CI. `test-merger-interactive.sh` (expect-driven) added alongside.
 
 ### Changed
 - `config-merger.sh` — `merge_json` no longer silently overwrites a user's
@@ -31,6 +35,11 @@ All notable changes to the Claude Code Stack are documented here. Format follows
   a valid ollama tag, and a model `tier-installer.sh` never pulls. Corrected
   to `ollama/qwen2.5-coder:32b`, the code model the installer actually pulls
   and `HARDWARE.md` recommends.
+- `config-merger.sh` `append_stack_section` declared `end_marker` only inside
+  the replace branch; the append branch read it unset, aborting any
+  `install.sh --mode=merge` of `CLAUDE.md` under `set -u` (the documented
+  default + `update.sh` path). Declaration hoisted so both branches see it.
+  Surfaced by wiring the test suite into CI.
 
 ## [1.1.3] — 2026-05-17
 

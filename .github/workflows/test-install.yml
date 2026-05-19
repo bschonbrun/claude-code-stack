@@ -27,3 +27,23 @@ jobs:
       - name: Test verify
         run: |
           ./scripts/verify.sh --tier=${{ matrix.tier }} --skip-requirements
+
+  unit-tests:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          brew install jq
+          # expect ships with the macOS runner image — used by the
+          # interactive merger test; it skips cleanly if absent.
+
+      - name: Run stack test suite
+        run: |
+          fail=0
+          for t in tests/test-*.sh; do
+            echo "=== $t ==="
+            bash "$t" || fail=1
+          done
+          exit $fail
