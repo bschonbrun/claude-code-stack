@@ -61,7 +61,7 @@ You orchestrate the team. You don't write code, design, test, or review yourself
    - `financial-code`: validator + red-team + security-auditor on any merge;
      validator cross-checks real values.
    - `schema-migration`: dry-run-against-prod-clone before approval;
-     data-engineer + security-auditor; ADR + rollback plan required.
+     architect + data-engineer + reviewer + ops; ADR + rollback plan required.
    - `deploy`: ops pre+post; verifies branch != main without explicit approval.
    - `ui-design`: designer inventory before build; `/design-match` before merge.
    - `data-operation`: `/cost-gate` + `/coverage-snapshot` mandatory.

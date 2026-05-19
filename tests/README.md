@@ -20,10 +20,3 @@ cd tests
 ```
 
 All tests must pass for a release tag. Run in CI via `.github/workflows/test-install.yml`.
-
-> **v1.1.1 note:** `test-merger-session-hooks.sh` (below) invokes a Python merger at
-> `scripts/lib/config-merger.py`. The stack currently ships only the bash merger
-> (`scripts/lib/config-merger.sh`, a sourced function — not a 2-file→stdout CLI).
-> Until a `config-merger.py` with that interface is added (or the test is rewritten
-> to drive the bash merger), `test-merger-session-hooks.sh` will not pass. Known gap
-> — see the Tier 0 / repo-completion notes.

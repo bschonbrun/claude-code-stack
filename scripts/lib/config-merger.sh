@@ -5,8 +5,8 @@ merge_json() {
   local source="$1"
   local target="$2"
 
-  # Deep merge: source values override only where target doesn't already have them
-  # Exception: arrays are concatenated (deduped); objects are deep-merged
+  # Deep merge: objects are deep-merged, arrays concatenated (deduped).
+  # On a scalar conflict the source (stack) value wins, unless it is null.
   local tmp
   tmp="$(mktemp)"
 

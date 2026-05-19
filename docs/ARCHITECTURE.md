@@ -15,9 +15,9 @@ The stack is a **configuration layer** on top of stock Claude Code. Nothing is f
 │  ~/.claude/  (global config)                                │
 │  ├── CLAUDE.md  (behavioral principles)                     │
 │  ├── settings.json  (hooks, permissions)                    │
-│  ├── agents/  (21 subagent definitions)                     │
-│  ├── skills/  (15 skills)                                   │
-│  └── hooks/  (6 hook scripts)                                │
+│  ├── agents/  (23 subagent definitions)                     │
+│  ├── skills/  (26 skills)                                   │
+│  └── hooks/  (3 hook scripts)                                │
 │       │                                                     │
 │       ▼                                                     │
 │  <project>/.claude/  (per-project config)                   │

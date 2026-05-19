@@ -8,16 +8,12 @@
 # arrays inside hook objects, not overwrite — and the SessionStart key
 # in particular is an array of hook-group objects (each with its own
 # inner hooks array). Easy to get wrong.
-#
-# NOTE (v1.1.1): this test invokes scripts/lib/config-merger.py. The stack
-# currently ships scripts/lib/config-merger.sh (a sourced bash function),
-# not a config-merger.py CLI. This test will not pass until that script is
-# added or the test is rewritten to drive the bash merger. Known gap.
 
 set -euo pipefail
 
 cd "$(dirname "$0")"
 SCRIPT_DIR="$(pwd)"
+source "$SCRIPT_DIR/../scripts/lib/config-merger.sh"
 TMPDIR="$(mktemp -d)"
 trap "rm -rf '$TMPDIR'" EXIT
 
@@ -51,11 +47,9 @@ cat > "$TMPDIR/tier-2-settings.json" << 'EOF'
 }
 EOF
 
-# Run merger
-python3 "$SCRIPT_DIR/../scripts/lib/config-merger.py" \
-  "$TMPDIR/tier-0-settings.json" \
-  "$TMPDIR/tier-2-settings.json" \
-  > "$TMPDIR/merged.json"
+# Run merger: merge_json merges SOURCE into TARGET in place
+cp "$TMPDIR/tier-0-settings.json" "$TMPDIR/merged.json"
+merge_json "$TMPDIR/tier-2-settings.json" "$TMPDIR/merged.json"
 
 # Assertions
 failures=0
@@ -108,10 +102,8 @@ cat > "$TMPDIR/tier-4-settings.json" << 'EOF'
 }
 EOF
 
-python3 "$SCRIPT_DIR/../scripts/lib/config-merger.py" \
-  "$TMPDIR/merged.json" \
-  "$TMPDIR/tier-4-settings.json" \
-  > "$TMPDIR/merged-3way.json"
+cp "$TMPDIR/merged.json" "$TMPDIR/merged-3way.json"
+merge_json "$TMPDIR/tier-4-settings.json" "$TMPDIR/merged-3way.json"
 
 three_way_count=$(python3 -c "
 import json
