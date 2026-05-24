@@ -5,6 +5,11 @@ All notable changes to the Claude Code Stack are documented here. Format follows
 ## [Unreleased]
 
 ### Added
+- SessionStart hook now warns when opening an un-initialized git repo
+  (no `.claude/stack-config.json`). Soft, non-blocking — points to
+  `/project-init`. Auto-detects the stack source repo itself by structural
+  markers (`agents/`, `skills/`, `scripts/install.sh`) so the warn doesn't
+  fire on the stack or forks of it. Stays silent in non-git dirs.
 - `project-init` discovery pass — before asking the user any questions,
   reads git log, branch state, prior handoffs (`.claude/next_prompt.md`,
   `docs/handoffs/`), package manifests (`package.json`, `pyproject.toml`,
