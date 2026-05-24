@@ -5,11 +5,21 @@ All notable changes to the Claude Code Stack are documented here. Format follows
 ## [Unreleased]
 
 ### Added
+- SessionStart hook now shows a ✅ banner with current settings when a
+  repo is initialized — tier, domain mode, strict-mode flag, sensitivity
+  level — plus shortcut commands to change any of them (`/tier`,
+  `/domain-mode`, `/strict-mode`, `/sensitivity`, `/cost-cap`) and a
+  reminder that `/project-init` can be re-run safely. Surfaces the
+  per-setting edit skills that were previously hidden.
 - SessionStart hook now warns when opening an un-initialized git repo
   (no `.claude/stack-config.json`). Soft, non-blocking — points to
   `/project-init`. Auto-detects the stack source repo itself by structural
   markers (`agents/`, `skills/`, `scripts/install.sh`) so the warn doesn't
   fire on the stack or forks of it. Stays silent in non-git dirs.
+- The bottom "── Claude Code Stack ──" multi-line marketing banner is now
+  a single-line key-commands footer
+  (`/goodmorning · /handoff · /project-init · /budget-guard · /operating`).
+  Less noise per session, same discoverability.
 - `project-init` discovery pass — before asking the user any questions,
   reads git log, branch state, prior handoffs (`.claude/next_prompt.md`,
   `docs/handoffs/`), package manifests (`package.json`, `pyproject.toml`,

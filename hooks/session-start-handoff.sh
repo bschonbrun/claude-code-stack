@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # SessionStart hook:
-# - Auto-load .claude/next_prompt.md if it exists.
-# - Warn if the current git repo isn't stack-initialized (no .claude/stack-config.json).
-# - Stay silent outside git repos and inside the stack source repo itself.
+# - Show ✅ banner with current stack settings + edit shortcuts if initialized.
+# - Show ⚠️ warn if in a git repo without .claude/stack-config.json.
+# - Auto-load .claude/next_prompt.md handoff if present.
+# - Print a one-line key-commands footer.
+# Stays silent outside git repos and inside the stack source repo itself.
 
 set -euo pipefail
 
-# Find the current git repo root (the right "project boundary").
-# Returns empty if we're not inside a git work tree.
 git_root() {
   git rev-parse --show-toplevel 2>/dev/null || true
 }
@@ -23,15 +23,40 @@ STACK_CONFIG="$GIT_ROOT/.claude/stack-config.json"
 HANDOFF="$GIT_ROOT/.claude/next_prompt.md"
 
 # Detect "this IS the stack source repo" by structural markers.
-# Prevents the warn from firing on the stack itself or forks of it.
+# Prevents banners from firing on the stack itself or forks of it.
 is_stack_source_repo() {
   [[ -d "$GIT_ROOT/agents" ]] && \
   [[ -d "$GIT_ROOT/skills" ]] && \
   [[ -f "$GIT_ROOT/scripts/install.sh" ]]
 }
 
-# Warn block — printed when we're in a consumer git repo with no stack-config.
-if [[ ! -f "$STACK_CONFIG" ]] && ! is_stack_source_repo; then
+# Read a JSON field from stack-config.json, with a fallback string.
+# Args: <jq filter> <fallback>
+read_cfg() {
+  if command -v jq &>/dev/null && [[ -f "$STACK_CONFIG" ]]; then
+    jq -r "$1 // \"$2\"" "$STACK_CONFIG" 2>/dev/null || echo "$2"
+  else
+    echo "$2"
+  fi
+}
+
+if is_stack_source_repo; then
+  # Stack source repo — skip both banners
+  :
+elif [[ -f "$STACK_CONFIG" ]]; then
+  # Initialized — show ✅ banner with current settings + edit shortcuts
+  TIER=$(read_cfg '.stack_tier' '?')
+  DOMAIN=$(read_cfg '.domain_mode' 'none')
+  STRICT=$(read_cfg 'if .strict_mode then "strict" else "permissive" end' '?')
+  SENSITIVITY=$(read_cfg '.sensitivity.level' 'normal')
+
+  echo ""
+  echo "✅ Stack active — Tier $TIER · $DOMAIN · $STRICT · sensitivity:$SENSITIVITY"
+  echo "   Change settings: /tier · /domain-mode · /strict-mode · /sensitivity · /cost-cap"
+  echo "   Re-run init: /project-init (asks before overwriting)"
+  echo ""
+else
+  # Uninitialized git repo — soft warn
   echo ""
   echo "⚠️  ──────────────────────────────────────────"
   echo "This repo is not stack-initialized."
@@ -45,7 +70,7 @@ if [[ ! -f "$STACK_CONFIG" ]] && ! is_stack_source_repo; then
   echo ""
 fi
 
-# Existing behavior: handoff if present, otherwise a brief reminder.
+# Handoff if present, otherwise a brief reminder.
 if [[ -f "$HANDOFF" ]]; then
   echo "──────────────────────────────────────────────"
   echo "Handoff from previous session:"
@@ -53,15 +78,12 @@ if [[ -f "$HANDOFF" ]]; then
   cat "$HANDOFF"
   echo "──────────────────────────────────────────────"
   echo "Run /goodmorning for full bootup (git state, PRs, CI)."
-else
+elif ! is_stack_source_repo; then
   echo "No handoff from previous session. Run /goodmorning for context, or just start working."
 fi
 
-echo ""
-echo "── Claude Code Stack ──────────────────────────"
-echo "This project runs on the stack: foreman orchestrates, subagents do"
-echo "the work, you approve at gates."
-echo "Key commands: /goodmorning (session start) · /handoff (session end)"
-echo "· /project-init (new project) · /budget-guard (before bulk LLM jobs)"
-echo "Run /operating for the full guide — how this is set up to operate."
-echo "──────────────────────────────────────────────"
+# Condensed one-line footer (skip on stack source repo)
+if ! is_stack_source_repo; then
+  echo ""
+  echo "── /goodmorning · /handoff · /project-init · /budget-guard · /operating ──"
+fi
