@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Write a handoff doc to .claude/next_prompt.md so the next Claude Code session can resume cleanly. Captures branch state, what shipped this session, what's blocked, exact next steps, and gotchas (env/auth/sandbox). The SessionStart hook reads this file at the start of the next session. Also archives a copy to docs/handoffs/<date>.md for long-term reference and cross-repo work.
+description: Write a handoff doc to .claude/next_prompt.md so the next Claude Code session can resume cleanly. Captures branch state, what shipped this session, what's blocked, exact next steps, and gotchas (env/auth/sandbox). The SessionStart hook reads this file at the start of the next session. Also archives a copy to docs/handoffs/<date>.md (git-tracked — sharable with collaborators) so other team members can pick up where you left off.
 ---
 
 # /handoff
@@ -65,10 +65,27 @@ _Written: <YYYY-MM-DD HH:MM PT>_
 ```
 
 ### 5. Write BOTH files
-- Write to `.claude/next_prompt.md` (overwrites previous).
-- Write to `docs/handoffs/$(date +%Y-%m-%d-%H%M).md` (new file each session).
+- Write to `.claude/next_prompt.md` (overwrites previous — local only, gitignored).
+- Write to `docs/handoffs/$(date +%Y-%m-%d-%H%M).md` (new file each session — git-tracked, sharable).
 
-### 6. Confirm
+### 6. Stage the archive (if git repo)
+
+If the working dir is inside a git repo (`git rev-parse --is-inside-work-tree`),
+auto-stage the archive file so it's ready to commit:
+- `git add docs/handoffs/<filename>.md`
+
+Do NOT commit automatically — the user may want to bundle it with other
+work-in-progress changes. Just stage it.
+
+If not in a git repo, skip silently.
+
+### 7. Confirm
 - Print absolute paths of both files.
 - Print first 5 lines of each as sanity check.
+- If the archive was staged, print:
+  > Archive staged. Commit + push to share with collaborators:
+  > `git commit -m "docs: session handoff <YYYY-MM-DD>"`
+  > Live handoff at `.claude/next_prompt.md` is local-only by design.
+- If skipped (not a git repo), print a one-liner explaining the archive
+  is at the path shown but not under version control.
 - Stop. Do not run further commands.

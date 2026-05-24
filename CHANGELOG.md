@@ -5,6 +5,18 @@ All notable changes to the Claude Code Stack are documented here. Format follows
 ## [Unreleased]
 
 ### Added
+- `project-init` discovery pass — before asking the user any questions,
+  reads git log, branch state, prior handoffs (`.claude/next_prompt.md`,
+  `docs/handoffs/`), package manifests (`package.json`, `pyproject.toml`,
+  etc.), README, and any partial `.claude/` setup. Prints a 5-line
+  discovery summary and pre-fills tier + domain-mode suggestions based
+  on what's actually in the repo. Catches the "ran init on a mature
+  in-flight project, got asked cold questions about a stack it could
+  have inferred" failure mode.
+- `handoff` auto-stages the `docs/handoffs/<timestamp>.md` archive when
+  in a git repo, and prints an explicit commit hint. Surfaces the
+  archive-vs-live split: archive is sharable with collaborators, live
+  `.claude/next_prompt.md` is local-only by design.
 - `verify.sh --repo=PATH` — verifies a single repo is correctly onboarded
   onto the stack: `stack-config.json` exists and is valid JSON, `stack_tier`
   is 0–5, `stack_version` is set, and `domain_mode` (if any) is a real mode

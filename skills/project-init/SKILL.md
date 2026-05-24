@@ -10,6 +10,8 @@ Two-mode project initialization. v1.1.
 ## Steps
 
 ### 1. Detect existing state
+
+**1a. Required checks**
 - Check for `.claude/stack-config.json`. If present, ask if user wants to update (don't blindly overwrite).
 - Check for `CLAUDE.md` at root. If present, note it.
 - Check for a git repo: `git rev-parse --is-inside-work-tree`. If it returns
@@ -18,6 +20,46 @@ Two-mode project initialization. v1.1.
   `/handoff`, `/goodmorning`, and foreman features that read git state will be
   limited.
 - Read `~/.claude/stack-defaults.json` for the user's personal defaults.
+
+**1b. Discovery pass (do this BEFORE asking the user anything)**
+
+If the project already exists in any meaningful sense — git history,
+deps, partial `.claude/` setup, prior handoffs — read it. Do not arrive
+at the user's project blind and ask cold questions.
+
+Read each of the following, silently, and tally what you find:
+
+- `git log --oneline -20` — recent commits (shows velocity and themes)
+- `git log --format="%an <%ae>" | sort -u` — contributors (1 person vs team)
+- `git status -sb` — current branch + uncommitted state
+- `git branch --show-current` — are we on a feature branch mid-work?
+- `.claude/next_prompt.md` — prior session handoff, if present
+- `docs/handoffs/` — count files, note latest filename + date
+- `package.json` / `pyproject.toml` / `Cargo.toml` / `go.mod` / `Gemfile` /
+  `requirements.txt` — infer language + framework + key deps
+- `README.md` first 50 lines — stated purpose / scope / audience
+- `.claude/agents/`, `.claude/skills/`, `.claude/hooks/` — prior partial
+  setup (someone may have copy-pasted bits of the stack)
+- `supabase/`, `migrations/`, `db/` — schema work in progress
+- `app/`, `src/`, `pages/` — UI work in progress
+- `.github/workflows/` — CI maturity
+
+**Print a 5-line discovery summary**, in the user's terminal, before
+asking any questions. Example:
+
+> Discovery: Vite+React+Supabase+Clerk. 47 commits on `master`, 1 author.
+> Existing `CLAUDE.md` with project conventions (3 roles, RLS-bound).
+> Prior handoff in `.claude/next_prompt.md` covers Supabase wire-up.
+> No prior `stack-config.json`. No `docs/handoffs/` directory yet.
+> Suggested: tier 2 + domain-mode `schema-migration`. Accept or override?
+
+**Use the discovery to pre-fill defaults** for the tier and domain-mode
+question (step 3). The user can accept the suggestion in one keystroke
+or override. Never force the cold question when the answer is sitting in
+the repo.
+
+If the discovery surfaces a prior handoff or in-flight work, mention it
+explicitly so the user knows nothing was lost.
 
 ### 2. Ask which mode
 Print:
