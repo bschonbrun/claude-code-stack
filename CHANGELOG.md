@@ -5,6 +5,18 @@ All notable changes to the Claude Code Stack are documented here. Format follows
 ## [Unreleased]
 
 ### Added
+- **Team-status instrumentation (Phase 1)**: every subagent dispatch is now
+  logged to `~/.claude/logs/subagent-runs.jsonl` via a PreToolUse hook
+  matched on the `Agent` tool. Each row carries timestamp, session_start,
+  project (git root or cwd), agent, description, and model. Powers a new
+  `/team-status` skill (roster + utilization + benched roles over a
+  configurable window, with `--global`, `--window`, `--session`, and
+  `--replan` modes) and new mini-sections in `/goodmorning` (Team line in
+  the summary fence listing benched roles over 14d) and `/handoff`
+  (`## Team this session` section with counts and rule-based misses for
+  domain-mode-required agents that weren't dispatched). SessionStart hook
+  also stamps `~/.claude/state/session-start.txt` so /handoff can compute
+  session-scoped counts.
 - Global CLAUDE.md now includes a "Session start protocol" directive
   telling the assistant to echo the SessionStart hook banner verbatim
   in its first response. Without this, the ✅/⚠️ banner reached the model

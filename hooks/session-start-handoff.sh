@@ -11,6 +11,11 @@
 
 set -euo pipefail
 
+# Stamp the session start time so /team-status (and the team-utilization section
+# in /handoff) can scope counts to "this session". Cheap and side-effect-free.
+mkdir -p "$HOME/.claude/state"
+date -u +%Y-%m-%dT%H:%M:%SZ > "$HOME/.claude/state/session-start.txt"
+
 git_root() {
   git rev-parse --show-toplevel 2>/dev/null || true
 }

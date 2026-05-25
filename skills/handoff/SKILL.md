@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Write a handoff doc to .claude/next_prompt.md so the next Claude Code session can resume cleanly. Captures branch state, what shipped this session, what's blocked, exact next steps, and gotchas (env/auth/sandbox). The SessionStart hook reads this file at the start of the next session. Also archives a copy to docs/handoffs/<date>.md (git-tracked — sharable with collaborators) so other team members can pick up where you left off.
+description: Write a handoff doc to .claude/next_prompt.md so the next Claude Code session can resume cleanly. Captures branch state, what shipped this session, what's blocked, exact next steps, and gotchas (env/auth/sandbox). The SessionStart hook reads this file at the start of the next session. Also archives a copy to docs/handoffs/<date>.md for long-term reference and cross-repo work.
 ---
 
 # /handoff
@@ -24,6 +24,11 @@ Run at the end of a working session. Writes `.claude/next_prompt.md` (the "live"
 - `git diff --stat HEAD~5..HEAD 2>/dev/null`
 - `gh pr list --author @me --state open 2>/dev/null`
 - `gh pr checks 2>/dev/null` (if PR exists for current branch)
+- **Team utilization this session** (skip block if `~/.claude/logs/subagent-runs.jsonl` is missing):
+  - `SESSION_START=$(cat ~/.claude/state/session-start.txt 2>/dev/null)`
+  - `PROJECT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)`
+  - Counts: `jq -r --arg s "$SESSION_START" --arg p "$PROJECT" 'select(.ts >= $s) | select(.project == $p) | .agent' ~/.claude/logs/subagent-runs.jsonl | sort | uniq -c | sort -rn`
+  - Misses: apply rules from `/team-status` Step 4 (financial-code → validator; schema-migration → data-engineer; deploy → ops; any-dispatch → architect-first).
 
 ### 4. Compose the handoff content
 
@@ -62,30 +67,19 @@ _Written: <YYYY-MM-DD HH:MM PT>_
 ## Cross-repo references
 - <If this work depends on or affects other repos, note them with specific files/PRs>
 (omit if standalone)
+
+## Team this session
+- Used: <comma list of agents with counts, e.g., "architect ×2, reviewer ×1">
+- Benched (should-have-fired):
+  - <agent>: <rule that flagged it, e.g., "domain_mode=financial-code, no validator dispatched">
+(omit "Benched" subsection if no misses; omit whole section if no log file yet)
 ```
 
 ### 5. Write BOTH files
-- Write to `.claude/next_prompt.md` (overwrites previous — local only, gitignored).
-- Write to `docs/handoffs/$(date +%Y-%m-%d-%H%M).md` (new file each session — git-tracked, sharable).
+- Write to `.claude/next_prompt.md` (overwrites previous).
+- Write to `docs/handoffs/$(date +%Y-%m-%d-%H%M).md` (new file each session).
 
-### 6. Stage the archive (if git repo)
-
-If the working dir is inside a git repo (`git rev-parse --is-inside-work-tree`),
-auto-stage the archive file so it's ready to commit:
-- `git add docs/handoffs/<filename>.md`
-
-Do NOT commit automatically — the user may want to bundle it with other
-work-in-progress changes. Just stage it.
-
-If not in a git repo, skip silently.
-
-### 7. Confirm
+### 6. Confirm
 - Print absolute paths of both files.
 - Print first 5 lines of each as sanity check.
-- If the archive was staged, print:
-  > Archive staged. Commit + push to share with collaborators:
-  > `git commit -m "docs: session handoff <YYYY-MM-DD>"`
-  > Live handoff at `.claude/next_prompt.md` is local-only by design.
-- If skipped (not a git repo), print a one-liner explaining the archive
-  is at the path shown but not under version control.
 - Stop. Do not run further commands.

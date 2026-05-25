@@ -48,15 +48,30 @@ Desktop workspaces commonly open at `~/foo/` where the real git repo + `.claude/
 - `git status --porcelain | grep -E '\.sql$|migrations/'`
 - `git log --since='7 days ago' --name-only --pretty=format: 2>/dev/null | sort -u | xargs grep -l 'TODO\|FIXME' 2>/dev/null | head -10`
 
+### 6b. Team benched check (skip if log missing)
+
+- Log: `~/.claude/logs/subagent-runs.jsonl`. If absent, `Team:` line in summary becomes `Team: no log yet`.
+- Window: last 14 days, scoped to current project.
+- Roster: `ls ~/.claude/agents/*.md 2>/dev/null` + `ls .claude/agents/*.md 2>/dev/null`. Strip path + `.md` for names.
+- Active set:
+  ```
+  CUTOFF=$(date -u -v-14d +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -d '14 days ago' +%Y-%m-%dT%H:%M:%SZ)
+  PROJECT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+  jq -r --arg c "$CUTOFF" --arg p "$PROJECT" 'select(.ts >= $c) | select(.project == $p) | .agent' \
+    ~/.claude/logs/subagent-runs.jsonl | sort -u
+  ```
+- Benched = roster minus active. Drop obvious-meta names (`historian`, `librarian`, `incident-commander`, `scribe`) — those don't fire routinely.
+
 ### 7. Print summary
 
-Emit summary **inside a single ``` fenced code block** (no language tag). Caveman tone — drop articles, fragments OK, short. ≤6 lines. Use these exact labels:
+Emit summary **inside a single ``` fenced code block** (no language tag). Caveman tone — drop articles, fragments OK, short. ≤7 lines. Use these exact labels:
 
 ```
 Left off: <one line from handoff next-steps, or last commit subject>
 Flight: <branch>, <N> dirty, <PR# + CI if any>
 Tier: <n + mode, or "uninit — run /project-init">
 Watch: <flags / pending SQL / stale TODOs>
+Team: <benched roles last 14d, comma list — or "all in play", or "no log yet">
 Next: <one concrete action>
 ```
 
