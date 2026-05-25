@@ -1,5 +1,7 @@
 # <Repo Name> — Agent Guide
 
+> Response style is governed globally by `~/.claude/CLAUDE.md` (<100 tokens default, no preamble, no recap, caveman tone, one-screen max). Override only if this repo has a genuine reason to be more verbose (e.g., teaching context).
+
 ## Overview
 
 <One-paragraph description: what this repo is, who uses it, what it produces.>
