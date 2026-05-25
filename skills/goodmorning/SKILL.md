@@ -9,6 +9,15 @@ Run these steps in order. The deliverable is a brief summary at the end — do n
 
 ## Steps
 
+### 0. Wrapper-folder detection (do this FIRST — before any other check)
+
+Desktop workspaces commonly open at `~/foo/` where the real git repo + `.claude/` live one level deeper at `~/foo/foo/`. If you skip this step you will report "no git repo / no handoff" when both actually exist.
+
+- Run `pwd`, then `git rev-parse --show-toplevel 2>/dev/null`.
+- If that command returns a path: you're inside a git repo, continue to Step 1.
+- If it returns empty (cwd is NOT a git repo): scan immediate subdirs for one containing `.claude/stack-config.json` OR `.claude/next_prompt.md` OR a `.git` entry. If exactly **one** subdir matches, `cd` into it and continue from there. Note `(wrapper detected — switched to <subdir>)` in the Flight line of the final summary.
+- If 0 or 2+ subdirs match, stay in cwd and proceed; the summary will reflect the missing repo honestly.
+
 ### 1. Confirm cwd & branch sanity
 - `pwd` — confirm which project.
 - `git branch --show-current`
@@ -41,17 +50,17 @@ Run these steps in order. The deliverable is a brief summary at the end — do n
 
 ### 7. Print summary
 
-Print exactly this structure (≤10 lines, terse):
+Emit summary **inside a single ``` fenced code block** (no language tag). Caveman tone — drop articles, fragments OK, short. ≤6 lines. Use these exact labels:
 
 ```
-**Where you left off:** <one line from handoff "next steps", or last commit subject>
-**In flight:** <branch>, <N> uncommitted files, <PR# + CI status if any>
-**Stack tier:** <from stack-config.json, or "not initialized — run /project-init">
-**Watch-outs:** <branch sanity flags + pending SQL + stale TODOs, or "none">
-**Suggested first move:** <one concrete action — usually top item from handoff next steps>
+Left off: <one line from handoff next-steps, or last commit subject>
+Flight: <branch>, <N> dirty, <PR# + CI if any>
+Tier: <n + mode, or "uninit — run /project-init">
+Watch: <flags / pending SQL / stale TODOs>
+Next: <one concrete action>
 ```
 
-Skip a section if empty.
+Skip any line that's empty. No prose outside the fence.
 
 ### 8. Stop and wait
 Do not start coding, planning, or asking follow-up questions. The summary is the deliverable. Wait for the next user prompt.
