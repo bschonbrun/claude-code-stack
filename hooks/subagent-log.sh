@@ -34,7 +34,7 @@ if command -v jq &>/dev/null; then
     --arg agent "$AGENT" \
     --arg desc "$DESC_TRIMMED" \
     --arg model "$MODEL" \
-    '{ts:$ts, session_start:$session_start, project:$project, agent:$agent, desc:$desc, model:$model}' \
+    '{event:"dispatch", ts:$ts, session_start:$session_start, project:$project, agent:$agent, desc:$desc, model:$model}' \
     >> "$LOG_FILE" 2>/dev/null || true
 fi
 

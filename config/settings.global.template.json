@@ -7,6 +7,10 @@
     "defaultMode": "auto",
     "additionalDirectories": []
   },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/hooks/statusline.sh"
+  },
   "hooks": {
     "SessionStart": [
       {
@@ -18,6 +22,20 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/brevity-reinforce.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/session-start-token-check.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/dispatch-nudge.sh"
           }
         ]
       }
@@ -31,6 +49,15 @@
             "command": "~/.claude/hooks/bulk-job-reminder.sh"
           }
         ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/subagent-log.sh"
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -40,6 +67,15 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/post-tool-tsc.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/subagent-complete-log.sh"
           }
         ]
       }
