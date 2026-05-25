@@ -5,6 +5,9 @@
 # - Auto-load .claude/next_prompt.md handoff if present.
 # - Print a one-line key-commands footer.
 # Stays silent outside git repos and inside the stack source repo itself.
+# Wrapper-folder fallback: if cwd isn't a git repo, scan immediate subdirs
+# for a single stack-initialized repo and use that (handles Desktop workspaces
+# that open at `~/foo/` containing the actual repo at `~/foo/foo/`).
 
 set -euo pipefail
 
@@ -12,11 +15,36 @@ git_root() {
   git rev-parse --show-toplevel 2>/dev/null || true
 }
 
-GIT_ROOT="$(git_root)"
+# Look one level down for a single stack-initialized git repo.
+# Echoes path only if exactly one match (avoid ambiguity).
+find_wrapped_repo() {
+  local candidate=""
+  local count=0
+  local d
+  for d in "$PWD"/*/; do
+    [[ -d "$d" ]] || continue
+    [[ -f "${d}.claude/stack-config.json" ]] || continue
+    git -C "$d" rev-parse --show-toplevel &>/dev/null || continue
+    candidate="${d%/}"
+    count=$((count + 1))
+  done
+  if [[ $count -eq 1 ]]; then
+    echo "$candidate"
+  fi
+  return 0
+}
 
-# Not in a git repo — silent. Could be a scratch dir, wrapper folder, etc.
+GIT_ROOT="$(git_root)"
+WRAPPED_FROM=""
+
 if [[ -z "$GIT_ROOT" ]]; then
-  exit 0
+  WRAPPED_FROM="$(find_wrapped_repo)"
+  if [[ -n "$WRAPPED_FROM" ]]; then
+    GIT_ROOT="$WRAPPED_FROM"
+  else
+    # Not in a git repo and no nested stack repo — silent.
+    exit 0
+  fi
 fi
 
 STACK_CONFIG="$GIT_ROOT/.claude/stack-config.json"
@@ -54,6 +82,9 @@ elif [[ -f "$STACK_CONFIG" ]]; then
   echo "✅ Stack active — Tier $TIER · $DOMAIN · $STRICT · sensitivity:$SENSITIVITY"
   echo "   Change settings: /tier · /domain-mode · /strict-mode · /sensitivity · /cost-cap"
   echo "   Re-run init: /project-init (asks before overwriting)"
+  if [[ -n "$WRAPPED_FROM" ]]; then
+    echo "   (detected nested repo at $WRAPPED_FROM — cd in for git commands)"
+  fi
   echo ""
 else
   # Uninitialized git repo — soft warn
