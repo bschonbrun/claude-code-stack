@@ -82,9 +82,10 @@ elif [[ -f "$STACK_CONFIG" ]]; then
   DOMAIN=$(read_cfg '.domain_mode' 'none')
   STRICT=$(read_cfg 'if .strict_mode then "strict" else "permissive" end' '?')
   SENSITIVITY=$(read_cfg '.sensitivity.level' 'normal')
+  MODE=$(read_cfg '.orchestration_mode' 'main-thread')
 
   echo ""
-  echo "✅ Stack active — Tier $TIER · $DOMAIN · $STRICT · sensitivity:$SENSITIVITY"
+  echo "✅ Stack active — $MODE · Tier $TIER · $DOMAIN · $STRICT · sensitivity:$SENSITIVITY"
   echo "   Change settings: /tier · /domain-mode · /strict-mode · /sensitivity · /cost-cap"
   echo "   Re-run init: /project-init (asks before overwriting)"
   if [[ -n "$WRAPPED_FROM" ]]; then
