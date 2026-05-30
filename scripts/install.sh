@@ -100,6 +100,24 @@ fi
 echo "[5/5] Verifying installation..."
 "$SCRIPT_DIR/verify.sh" --tier="$TIER" ${SKIP_REQUIREMENTS:+--skip-requirements}
 
+# Record an install stamp so freshness checks (lib/stack-freshness.sh, used by
+# /goodmorning and /project-init) can tell whether ~/.claude is behind the
+# source repo. Best-effort: skip silently if jq is unavailable.
+if command -v jq >/dev/null 2>&1; then
+  source_sha="$(git -C "$REPO_ROOT" rev-parse HEAD 2>/dev/null || echo "")"
+  source_branch="$(git -C "$REPO_ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")"
+  stack_version="$(jq -r '.stack_version // "unknown"' "$REPO_ROOT/templates/stack-defaults.template.json" 2>/dev/null || echo "unknown")"
+  jq -n \
+    --arg ver "$stack_version" \
+    --argjson tier "$TIER" \
+    --arg sha "$source_sha" \
+    --arg branch "$source_branch" \
+    --arg repo "$REPO_ROOT" \
+    --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    '{stack_version:$ver, tier:$tier, source_sha:$sha, source_branch:$branch, source_repo:$repo, installed_at:$at}' \
+    > "$CLAUDE_DIR/.stack-install.json"
+fi
+
 echo "==============================================="
 echo "Install complete. Stack tier $TIER is live."
 echo "==============================================="

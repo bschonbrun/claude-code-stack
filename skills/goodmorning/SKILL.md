@@ -62,6 +62,22 @@ Desktop workspaces commonly open at `~/foo/` where the real git repo + `.claude/
   ```
 - Benched = roster minus active. Drop obvious-meta names (`historian`, `librarian`, `incident-commander`, `scribe`) — those don't fire routinely.
 
+### 6c. Stack freshness check (skip silently if helper missing)
+
+Is the locally-installed stack (`~/.claude`) behind the source repo? This is a
+**nudge only** — never run `update.sh` from here (this skill prints and waits).
+
+- If `~/.claude/lib/stack-freshness.sh` exists, run:
+  ```
+  bash ~/.claude/lib/stack-freshness.sh --oneline
+  ```
+- The helper is best-effort (handles missing stamp / offline / no repo) and
+  prints a compact token. Map it to the `Stack:` line:
+  - `current` → omit the line (don't clutter the summary).
+  - `N behind — run update.sh` → `Stack: N behind — run update.sh`.
+  - anything else (`unstamped`, `repo-not-found`, …) → omit the line.
+- If the helper file is absent (Tier 0 not installed / older install), skip silently.
+
 ### 7. Print summary
 
 Emit summary **inside a single ``` fenced code block** (no language tag). Caveman tone — drop articles, fragments OK, short. ≤7 lines. Use these exact labels:
@@ -72,6 +88,7 @@ Flight: <branch>, <N> dirty, <PR# + CI if any>
 Tier: <n + mode, or "uninit — run /project-init">
 Watch: <flags / pending SQL / stale TODOs>
 Team: <benched roles last 14d, comma list — or "all in play", or "no log yet">
+Stack: <N behind — run update.sh — omit line entirely if current/unknown>
 Next: <one concrete action>
 ```
 

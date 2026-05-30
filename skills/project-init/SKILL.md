@@ -20,6 +20,18 @@ Two-mode project initialization. v1.2.
   `/handoff`, `/goodmorning`, and foreman features that read git state will be
   limited.
 - Read `~/.claude/stack-defaults.json` for the user's personal defaults.
+- **Stack freshness.** If `~/.claude/lib/stack-freshness.sh` exists, run
+  `bash ~/.claude/lib/stack-freshness.sh` (exit code 10 = behind). If it
+  reports the install is behind, surface it and offer to update before
+  initializing — a stale local stack means you'd init against old routing /
+  schema logic:
+  > "Your installed stack is N commit(s) behind origin/<branch>. Update now
+  > before initializing this project? [y/N]"
+  - If yes: run `./scripts/update.sh --tier=<installed tier>` in the stack
+    repo (path is in `~/.claude/.stack-install.json` → `source_repo`), then
+    continue. Add `--skip-requirements` if the local box lacks codex/gemini.
+  - If no: continue, but note in the final summary that the stack is stale.
+  - Skip silently if the helper is absent or reports `current`/unknown.
 
 **1b. Discovery pass (do this BEFORE asking the user anything)**
 
