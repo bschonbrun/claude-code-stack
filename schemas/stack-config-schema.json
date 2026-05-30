@@ -81,6 +81,30 @@
         "per_session_hard_cap_usd": { "type": ["number", "null"], "minimum": 0 }
       }
     },
+    "brevity": {
+      "type": "object",
+      "description": "v1.2: Per-project tuning for the brevity-drift UserPromptSubmit hook (hooks/brevity-drift.sh). Absent -> the hook uses its built-in defaults (enabled, 120 words / 6 sentences). Any field missing or non-numeric falls back to that default.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "If false, the brevity-drift hook stays silent for this project (e.g. docs- or prose-heavy repos)."
+        },
+        "word_budget": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 120,
+          "description": "Word count above which the assistant's last response triggers a brevity correction."
+        },
+        "sentence_budget": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 6,
+          "description": "Sentence count above which the assistant's last response triggers a brevity correction."
+        }
+      },
+      "additionalProperties": false
+    },
     "change_history": {
       "type": "array",
       "items": {

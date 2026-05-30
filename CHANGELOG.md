@@ -4,6 +4,21 @@ All notable changes to the Claude Code Stack are documented here. Format follows
 
 ## [Unreleased]
 
+### Added
+- **Per-project brevity thresholds**: `hooks/brevity-drift.sh` now reads an
+  optional `brevity` block from the nearest `.claude/stack-config.json` (via
+  the shared `lib/find-stack-config.sh` finder, same as `dispatch-nudge.sh`):
+  `enabled` (false opts a project out of drift correction entirely),
+  `word_budget`, and `sentence_budget`. Absent, null, or non-numeric values
+  fall back to the built-in defaults (enabled, 120 words / 6 sentences), so a
+  malformed config can only fall back, never misbehave. Added the `brevity`
+  object to `stack-config-schema.json` (with `additionalProperties: false`)
+  and a default block to `templates/stack-config.template.json`. This
+  establishes the config contract for a future `/project-init` step that asks
+  for these values. (Note: avoided jq's `//` operator for the `enabled` check —
+  `// true` falls through on both null and false, which would silently re-enable
+  an explicitly disabled project.)
+
 ### Fixed
 - **`/project-init` `.gitignore` block now covers all runtime scratch**
   (`stack_version` → `1.1.4`). The block previously only ignored
