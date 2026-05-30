@@ -13,15 +13,39 @@
 
 set -uo pipefail
 
-# Budget — tune here. A response over EITHER axis triggers a correction.
+# Defaults. A response over EITHER axis triggers a correction. A project can
+# override these (or opt out) via a "brevity" block in its stack-config.json;
+# see below. Absent config -> these built-in defaults apply everywhere.
 WORD_BUDGET=120
 SENTENCE_BUDGET=6
 
 INPUT="$(cat 2>/dev/null || echo '{}')"
 TRANSCRIPT="$(echo "$INPUT" | jq -r '.transcript_path // empty' 2>/dev/null)"
+CWD="$(echo "$INPUT" | jq -r '.cwd // empty' 2>/dev/null)"
+[[ -z "$CWD" ]] && CWD="$PWD"
 
 # No transcript (e.g. the very first turn) -> nothing to measure.
 [[ -z "$TRANSCRIPT" || ! -f "$TRANSCRIPT" ]] && exit 0
+
+# Per-project tuning: read the nearest .claude/stack-config.json via the shared
+# finder (same one dispatch-nudge.sh uses). brevity.enabled=false opts a project
+# out entirely; word_budget / sentence_budget override the defaults above.
+# Anything missing, null, or non-numeric leaves the default in place — so a
+# malformed config can never make the hook misbehave, only fall back.
+FINDER="$HOME/.claude/lib/find-stack-config.sh"
+if [[ -x "$FINDER" ]]; then
+  CONFIG="$(bash "$FINDER" "$CWD" 2>/dev/null || true)"
+  if [[ -n "$CONFIG" && -f "$CONFIG" ]]; then
+    # Note: do NOT use `.brevity.enabled // true` — jq's // falls through on
+    # both null AND false, so an explicit false would be read as true. Compare
+    # the raw value instead (absent -> "null" -> stays enabled).
+    [[ "$(jq -r '.brevity.enabled' "$CONFIG" 2>/dev/null)" == "false" ]] && exit 0
+    WB="$(jq -r '.brevity.word_budget // empty' "$CONFIG" 2>/dev/null)"
+    SB="$(jq -r '.brevity.sentence_budget // empty' "$CONFIG" 2>/dev/null)"
+    [[ "$WB" =~ ^[0-9]+$ ]] && WORD_BUDGET="$WB"
+    [[ "$SB" =~ ^[0-9]+$ ]] && SENTENCE_BUDGET="$SB"
+  fi
+fi
 
 # Pull the text of the most recent assistant turn: every text block emitted
 # after the last genuine human prompt. Tool-result entries are also role:user

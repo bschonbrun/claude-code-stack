@@ -21,5 +21,10 @@
     "per_day_alert_usd": 50.00,
     "per_session_hard_cap_usd": null
   },
+  "brevity": {
+    "enabled": true,
+    "word_budget": 120,
+    "sentence_budget": 6
+  },
   "change_history": []
 }
