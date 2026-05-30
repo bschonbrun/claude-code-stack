@@ -5,6 +5,22 @@ All notable changes to the Claude Code Stack are documented here. Format follows
 ## [Unreleased]
 
 ### Added
+- **Session preferences picker (`/session`)**: a per-session, multiple-choice
+  way to set communication style (terse/balanced/thorough), model effort,
+  explanation verbosity, orchestration mode, and cost-alert sensitivity — so
+  different users get their own defaults without hand-editing config. New
+  `/session` skill (Tier 1) drives an `AskUserQuestion` menu, writes the live
+  choice to `~/.claude/session-state/current-prefs.json` (+ `last-prefs.json`
+  to remember last), and offers opt-in persistence to global
+  (`stack-defaults.session_prefs_defaults`) or project
+  (`stack-config.session_prefs`). New `hooks/session-prefs-init.sh`
+  (`SessionStart`, Tier 0) resolves precedence built-in < global < project into
+  the session-state file so defaults apply without running `/session`; per-session
+  choices are ephemeral. `brevity-drift.sh` reads `communication_style` as the
+  highest-precedence budget (above the per-project block below): terse ≈ 70/4,
+  balanced ≈ 120/6, thorough ≈ 320/16. `session_prefs` / `session_prefs_defaults`
+  added to both schemas + templates. Offered (not forced) atop `/goodmorning`
+  (the one permitted boot prompt, plus a `Style:` summary line) and `/project-init`.
 - **Per-project brevity thresholds**: `hooks/brevity-drift.sh` now reads an
   optional `brevity` block from the nearest `.claude/stack-config.json` (via
   the shared `lib/find-stack-config.sh` finder, same as `dispatch-nudge.sh`):

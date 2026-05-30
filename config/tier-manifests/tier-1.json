@@ -19,6 +19,7 @@
       { "from": "skills/sensitivity/SKILL.md", "to": "~/.claude/skills/sensitivity/SKILL.md" },
       { "from": "skills/cost-cap/SKILL.md", "to": "~/.claude/skills/cost-cap/SKILL.md" },
       { "from": "skills/tier/SKILL.md", "to": "~/.claude/skills/tier/SKILL.md" },
+      { "from": "skills/session/SKILL.md", "to": "~/.claude/skills/session/SKILL.md" },
       { "from": "templates/stack-defaults.template.json", "to": "~/.claude/stack-defaults.json", "prompt_for_values": true }
     ]
   },
@@ -38,6 +39,7 @@
     "test -f ~/.claude/skills/sensitivity/SKILL.md",
     "test -f ~/.claude/skills/cost-cap/SKILL.md",
     "test -f ~/.claude/skills/tier/SKILL.md",
+    "test -f ~/.claude/skills/session/SKILL.md",
     "test -f ~/.claude/stack-defaults.json"
   ]
 }
