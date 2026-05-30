@@ -35,6 +35,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "~/.claude/hooks/brevity-drift.sh"
+          },
+          {
+            "type": "command",
             "command": "~/.claude/hooks/dispatch-nudge.sh"
           }
         ]
