@@ -6,6 +6,7 @@
     "global": [
       { "from": "config/claude.md.global.template", "to": "~/.claude/CLAUDE.md", "merge": true },
       { "from": "config/settings.global.template.json", "to": "~/.claude/settings.json", "merge": true },
+      { "from": "hooks/session-prefs-init.sh", "to": "~/.claude/hooks/session-prefs-init.sh", "executable": true },
       { "from": "hooks/session-start-handoff.sh", "to": "~/.claude/hooks/session-start-handoff.sh", "executable": true },
       { "from": "hooks/brevity-reinforce.sh", "to": "~/.claude/hooks/brevity-reinforce.sh", "executable": true },
       { "from": "hooks/brevity-drift.sh", "to": "~/.claude/hooks/brevity-drift.sh", "executable": true },
@@ -32,6 +33,7 @@
   "smoke_tests": [
     "test -f ~/.claude/CLAUDE.md",
     "test -f ~/.claude/settings.json",
+    "test -x ~/.claude/hooks/session-prefs-init.sh",
     "test -x ~/.claude/hooks/session-start-handoff.sh",
     "test -x ~/.claude/hooks/brevity-reinforce.sh",
     "test -x ~/.claude/hooks/brevity-drift.sh",

@@ -62,6 +62,18 @@
         "required_for_audit_reports": { "type": "boolean", "default": true },
         "required_for_design_docs": { "type": "boolean", "default": true }
       }
+    },
+    "session_prefs_defaults": {
+      "type": "object",
+      "description": "v1.2: User-level default session preferences. Fallback when a project has no session_prefs and no live session override. Same fields as stack-config session_prefs.",
+      "properties": {
+        "communication_style": { "type": "string", "enum": ["terse", "balanced", "thorough"], "default": "balanced" },
+        "model_effort": { "type": "string", "enum": ["fast", "balanced", "max"], "default": "balanced" },
+        "explanation_verbosity": { "type": "string", "enum": ["minimal", "normal", "teaching"], "default": "normal" },
+        "orchestration_mode": { "type": "string", "enum": ["main-thread", "agent-teams", "hybrid", "dynamic-workflows"] },
+        "cost_alert_sensitivity": { "type": "string", "enum": ["relaxed", "normal", "strict"], "default": "normal" }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false

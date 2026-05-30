@@ -17,6 +17,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "~/.claude/hooks/session-prefs-init.sh"
+          },
+          {
+            "type": "command",
             "command": "~/.claude/hooks/session-start-handoff.sh"
           },
           {

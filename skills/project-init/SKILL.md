@@ -245,6 +245,12 @@ don't need a project-level ignore.)
 > That's a cross-skill refactor (each skill would change its write path); fix
 > the ignore block now, track the consolidation separately.
 
+**Offer session preferences.** Once, before suggesting the commit:
+> "Set communication / working preferences now (style, effort, verbosity)? [y/N]"
+- If yes: run the `/session` skill. Its "save as **project** default" writes the
+  choices into this project's `stack-config.json` `session_prefs`.
+- If no: continue — defaults apply, and `/session` can be run anytime.
+
 **Suggest the commit.** Do not commit automatically. Print the suggested
 command for the user to run:
 ```

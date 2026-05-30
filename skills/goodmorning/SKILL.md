@@ -78,6 +78,19 @@ Is the locally-installed stack (`~/.claude`) behind the source repo? This is a
   - anything else (`unstamped`, `repo-not-found`, …) → omit the line.
 - If the helper file is absent (Tier 0 not installed / older install), skip silently.
 
+### 6d. Session preferences (offer once — the one permitted prompt)
+
+Exception to this skill's no-questions rule: a single boot-time offer to set
+communication/working preferences.
+
+- Read `~/.claude/session-state/current-prefs.json`. If absent or `source` is
+  `"config"` (i.e. not yet customized this session), ask **once**:
+  > "Set session preferences (style, effort, verbosity)? [y/N]"
+  - If yes: run the `/session` skill, then continue to the summary.
+  - If no / no answer: continue.
+- If `source` is already `"session"`, skip silently (don't re-offer).
+- Skip silently if the state file's directory can't be read.
+
 ### 7. Print summary
 
 Emit summary **inside a single ``` fenced code block** (no language tag). Caveman tone — drop articles, fragments OK, short. ≤7 lines. Use these exact labels:
@@ -89,10 +102,11 @@ Tier: <n + mode, or "uninit — run /project-init">
 Watch: <flags / pending SQL / stale TODOs>
 Team: <benched roles last 14d, comma list — or "all in play", or "no log yet">
 Stack: <N behind — run update.sh — omit line entirely if current/unknown>
+Style: <communication_style·model_effort from current-prefs.json — "/session to change"; omit if no state file>
 Next: <one concrete action>
 ```
 
 Skip any line that's empty. No prose outside the fence.
 
 ### 8. Stop and wait
-Do not start coding, planning, or asking follow-up questions. The summary is the deliverable. Wait for the next user prompt.
+Do not start coding, planning, or asking follow-up questions (other than the single step 6d preferences offer). The summary is the deliverable. Wait for the next user prompt.

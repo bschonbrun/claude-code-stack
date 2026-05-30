@@ -26,5 +26,11 @@
     "word_budget": 120,
     "sentence_budget": 6
   },
+  "session_prefs": {
+    "communication_style": "balanced",
+    "model_effort": "balanced",
+    "explanation_verbosity": "normal",
+    "cost_alert_sensitivity": "normal"
+  },
   "change_history": []
 }

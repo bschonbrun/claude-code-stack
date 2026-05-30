@@ -47,6 +47,20 @@ if [[ -x "$FINDER" ]]; then
   fi
 fi
 
+# Live session override (highest precedence): /session and the session-prefs
+# SessionStart hook write communication_style to the session-state file. Map
+# style -> budgets; an explicit choice supersedes project config above. Missing
+# file or unknown style leaves the values from earlier untouched.
+PREFS="$HOME/.claude/session-state/current-prefs.json"
+if [[ -f "$PREFS" ]]; then
+  STYLE="$(jq -r '.communication_style // empty' "$PREFS" 2>/dev/null)"
+  case "$STYLE" in
+    terse)    WORD_BUDGET=70;  SENTENCE_BUDGET=4 ;;
+    balanced) WORD_BUDGET=120; SENTENCE_BUDGET=6 ;;
+    thorough) WORD_BUDGET=320; SENTENCE_BUDGET=16 ;;
+  esac
+fi
+
 # Pull the text of the most recent assistant turn: every text block emitted
 # after the last genuine human prompt. Tool-result entries are also role:user
 # in the transcript, so "human prompt" = a user entry whose content is a plain

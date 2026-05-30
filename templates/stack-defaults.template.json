@@ -28,5 +28,11 @@
     "required_for_specs": true,
     "required_for_audit_reports": true,
     "required_for_design_docs": true
+  },
+  "session_prefs_defaults": {
+    "communication_style": "balanced",
+    "model_effort": "balanced",
+    "explanation_verbosity": "normal",
+    "cost_alert_sensitivity": "normal"
   }
 }
