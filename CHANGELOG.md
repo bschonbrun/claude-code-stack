@@ -26,6 +26,17 @@ All notable changes to the Claude Code Stack are documented here. Format follows
   cross-skill refactor tracked separately.
 
 ### Added
+- **Adaptive brevity enforcement (`brevity-drift.sh`)**: new
+  `UserPromptSubmit` hook that keeps the response-style rules from decaying
+  mid-session. `brevity-reinforce.sh` injects the full rules once at
+  `SessionStart`, but that dilutes as context grows and the model drifts back
+  to verbose prose. This hook measures the assistant's most recent response on
+  every turn and injects a one-shot correction **only** when it exceeded
+  budget (default: >120 words or >6 sentences) — silent when already terse, so
+  it never becomes noise the model tunes out. Fail-safe: any transcript-parse
+  problem yields no output and a clean exit, so the hook can never block a
+  turn. Wired into the global settings template's `UserPromptSubmit` ahead of
+  `dispatch-nudge.sh`; installed at tier 0.
 - **Parallel-mode safety + `dynamic-workflows` orchestration mode**: two
   hardening changes to `/foreman` for the Opus 4.8 experimental
   orchestration features.
@@ -148,6 +159,16 @@ All notable changes to the Claude Code Stack are documented here. Format follows
   customizations" contract.
 
 ### Fixed
+- **`brevity-reinforce.sh` was never installed**: the `SessionStart`
+  brevity-reinforcement hook was wired into
+  `config/settings.global.template.json` but missing from every tier
+  manifest's `files.global`, so `install.sh` never copied it to
+  `~/.claude/hooks/`. The configured `SessionStart` command pointed at a file
+  that did not exist, so the brevity baseline never fired at all — the main
+  reason the response style "never happened without constant reminders."
+  Registered it (and the new `brevity-drift.sh`) in the tier-0 manifest with
+  matching smoke tests. (Same class of bug as the `subagent-log.sh` /
+  `statusline.sh` miss below.)
 - Tier manifests now correctly register `subagent-log.sh` and
   `statusline.sh`, which the team-status Phase 1 commit (a9406eb) had
   installed into the working copy but never added to `tier-2.json` /
