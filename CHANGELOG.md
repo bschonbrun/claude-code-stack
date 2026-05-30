@@ -52,6 +52,20 @@ All notable changes to the Claude Code Stack are documented here. Format follows
   problem yields no output and a clean exit, so the hook can never block a
   turn. Wired into the global settings template's `UserPromptSubmit` ahead of
   `dispatch-nudge.sh`; installed at tier 0.
+- **Local stack-freshness checks**: `install.sh` now writes an install stamp
+  to `~/.claude/.stack-install.json` (source SHA, branch, repo path, tier,
+  timestamp). New shared helper `lib/stack-freshness.sh` (installed at Tier 0)
+  reads the stamp, fetches the source repo, and reports how many commits the
+  installed stack is behind `origin/<branch>` — best-effort and non-fatal
+  (missing stamp / offline / no repo all resolve to a benign status; exit 10
+  signals "behind"). Wired into two skills:
+  - `/goodmorning` gains a `Stack: N behind — run update.sh` line in the daily
+    summary fence (nudge only; omitted when current — never auto-updates,
+    respecting the print-and-wait contract).
+  - `/project-init` gains an interactive check in step 1a that offers to run
+    `update.sh` before initializing when the local install is stale.
+  Addresses the gap where local `~/.claude` silently drifts behind `main`
+  (web sessions self-install fresh, but local installs are manual).
 - **Parallel-mode safety + `dynamic-workflows` orchestration mode**: two
   hardening changes to `/foreman` for the Opus 4.8 experimental
   orchestration features.
