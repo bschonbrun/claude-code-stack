@@ -1,6 +1,6 @@
 # ADR 013: Core/overlay model for organization-specific customization
 
-**Status:** Proposed
+**Status:** Accepted (amended 2026-05-30 — see "Amendments" below)
 **Date:** 2026-05-30
 **Author:** the maintainer + Claude
 
@@ -34,7 +34,10 @@ Adopt a **core + overlay** model with a strict contract.
 
 2. **Repo-init time** (`/project-init`) → the overlay supplies the organization's `CLAUDE.md` template and standards, which are injected into every newly initialized repo automatically. New project inherits core behavior + company standards in one step.
 
-This is the same layering the stack already uses for defaults (`built-in < global session_prefs_defaults < project`); the overlay slots in as a named layer between core and project.
+The overlay slots in as a named layer between core and project. Note there are in fact **two distinct mechanisms** the overlay touches, not one (this is corrected in the Amendments section — the original text wrongly called them "the same layering"):
+
+- **Read-time defaults resolution** — how the running stack resolves a setting's value: `built-in < global session_prefs_defaults < project`. The overlay adds a layer here.
+- **Install-time file composition** — how files land in `~/.claude` (`scripts/lib/tier-installer.sh` + `config-merger.sh`). This is where override resolution actually runs, and its current semantics do **not** match the precedence above (see Amendments).
 
 ## Alternatives considered
 
@@ -64,3 +67,39 @@ Core stays public and generic; each org keeps a private overlay of pure deltas; 
 1. Keep this repo as the generic public core.
 2. Stand up private `CarboNet-Nano/carbonet-standards` with the 6 migrated `STANDARDS/*.md`.
 3. Apply it directly for now; formalize the install-time merge mechanism when org #2 appears.
+
+## Amendments (review, 2026-05-30)
+
+Accepted on review against the core's actual structure (`scripts/lib/config-merger.sh`, `scripts/lib/tier-installer.sh`, tier manifests, and the read-time defaults chain). The model and the deltas-only contract are sound and the rejected alternatives are correctly rejected. Three corrections, and one decision the original deferred.
+
+### 1. Precedence inversion in the install-time merge (must-fix before the mechanism ships)
+
+The original Consequences say the merge mechanism is "extend `scripts/lib/config-merger.sh`." That is not a safe drop-in. `merge_json` resolves a scalar conflict by **keeping the target (the value already on disk)** and applying the stack's incoming value only on explicit user approval — i.e. *target/user wins*. Installs apply tiers cumulatively, so if the overlay is applied as a later step, the overlay is the *source* and an already-installed core value is the *target* — meaning **the overlay would lose to core**, the exact opposite of this ADR's `core < overlay` precedence.
+
+Therefore the override resolver cannot reuse `merge_json`'s default semantics for overlay-over-core. It needs an explicit application order where, on conflict: `core < overlay`, and then `overlay < project/user`. Concretely that is two different conflict-winners depending on which pair is merging — not one global rule. Whoever builds this owns reconciling that, not just "calling the existing merger."
+
+### 2. Two mechanisms, not one (corrected inline above)
+
+The overlay touches both read-time defaults resolution and install-time file composition; they are separate systems with separate semantics. The Decision text has been corrected.
+
+### 3. CLAUDE.md single managed-marker limitation (must-fix for composition point 2)
+
+`append_stack_section` supports exactly one `<!-- CLAUDE_CODE_STACK_MANAGED -->` … `<!-- /…_MANAGED -->` block per file. Composition point 2 (repo-init injecting the org's CLAUDE.md template) would collide with the core's own managed section — only one survives. The repo-init injection needs a **distinct overlay marker** (e.g. `<!-- ORG_OVERLAY_MANAGED -->`) so core-managed and org-managed sections coexist and both stay idempotently re-writable.
+
+### Override semantics — decided now, not deferred
+
+The original defers both the mechanism *and* its spec until org #2. Deferring the **implementation** is right (YAGNI — only CarboNet exists and is applied directly). Deferring the **spec** is not: CarboNet's overlay is being authored against this contract *today*, so the override semantic must be pinned now or overlay authors build against an undefined target. Pinning it is one paragraph; discovering a mismatch at org #2 is a rewrite of an org's overlay.
+
+**Override resolution semantic (mirrors the existing per-type dispatch at `tier-installer.sh` lines 37–47):**
+
+| Overlay file type | Resolution against the core file it overrides |
+|---|---|
+| `*.json` config | **Deep-merge**, overlay wins on scalar conflict (then project/user wins over overlay) |
+| `CLAUDE.md` / templates with managed markers | **Marker-region replace** under the org overlay marker (see #3) |
+| Everything else (skills, agents, prompts, standards `*.md`) | **Whole-file replace** — these are documents; deep-merging prose is meaningless |
+
+This is exactly the type-based branching the installer already does; the overlay resolver should extend that dispatch rather than invent a new model.
+
+### Lint check is now load-bearing, not optional
+
+The "no core file copied verbatim" lint the original lists as a later nicety is the *only* enforcement of the deltas-only contract that keeps `git pull` upstream conflict-free. Without it the contract is honor-system and will erode. It should ship with the mechanism (org #2), not after.
