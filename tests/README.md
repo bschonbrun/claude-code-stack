@@ -9,6 +9,7 @@ Tests for the stack itself. Run before any release / breaking change.
 - `test-config-merger.sh` — JSON merge logic doesn't lose user data; includes a scalar-conflict scenario (non-interactive run keeps the user value).
 - `test-merger-session-hooks.sh` (v1.1) — verify nested SessionStart hooks from multiple tiers merge correctly (Tier 0's hook + Tier 2's hook both fire after merge).
 - `test-merger-interactive.sh` — verify the interactive conflict prompt (approve → stack value, decline → user value kept), driven through a pty via `expect`. Skips cleanly if `expect` is unavailable.
+- `test-cloud-bootstrap.sh` — verify `scripts/cloud-bootstrap.sh` never hard-fails a cloud session: no-op outside cloud, warn+exit 0 on missing token, short-circuit on the per-boot marker. Offline-only (the clone+install path is covered by `test-install.sh`).
 
 ## Running
 
