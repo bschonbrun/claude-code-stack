@@ -205,6 +205,41 @@ the template by hand.
 **Scaffold ONBOARDING.md.** If `docs/ONBOARDING.md` is absent, copy
 `~/.claude/templates/PROJECT-ONBOARDING.md.template` to it.
 
+**Set up cloud-session support (web + iOS).** Cloud sessions run in an
+ephemeral container that never sees the user's laptop `~/.claude`, so the
+stack's skills/commands aren't discoverable unless they travel with the repo
+or are installed at session start. Offer once:
+> "Make the stack work in this repo's Claude Code cloud sessions (web/iOS)?
+> This commits a SessionStart bootstrap hook + a small portable-core skill
+> set into `.claude/`. [Y/n]"
+
+If yes, do all of the following **idempotently — never clobber existing
+files; merge or skip and warn instead**:
+
+1. **Bootstrap hook.** If `.claude/hooks/cloud-bootstrap.sh` is absent, copy
+   `~/.claude/scripts/cloud-bootstrap.sh` to it and `chmod +x`. If it already
+   exists, leave it and note that it was kept.
+2. **Wire SessionStart.** Merge the `SessionStart` entry from
+   `~/.claude/templates/project-cloud-settings.template.json` into the repo's
+   `.claude/settings.json` (the entry runs
+   `$CLAUDE_PROJECT_DIR/.claude/hooks/cloud-bootstrap.sh`). If
+   `.claude/settings.json` exists, deep-merge — do **not** overwrite it; if an
+   equivalent `cloud-bootstrap.sh` SessionStart entry is already present, skip.
+   If absent, write the template as the new file.
+3. **Portable-core skills.** Read the skill list from
+   `~/.claude/config/portable-core-skills.json`. For each, copy
+   `~/.claude/skills/<name>/` into `.claude/skills/<name>/` only if the
+   destination is absent (skip + note any that already exist). These give the
+   repo an offline-safe floor (e.g. `/goodmorning`, `/handoff`) even before the
+   bootstrap clone finishes or if the environment's network policy blocks it.
+4. **Token reminder.** Remind the user (don't block): the bootstrap clones a
+   **private** repo, so the cloud environment must define
+   `CLAUDE_STACK_REPO_TOKEN`. Point them at `docs/CLOUD.md`. Never write a
+   token into any committed file.
+
+If the user declines, skip this block — the env-level setup script in
+`docs/CLOUD.md` can still cover every repo.
+
 **Update `.gitignore`.** Ensure every entry below is present (append any
 that are missing — match on the exact line so re-runs don't duplicate). This
 block must cover **all** the runtime scratch paths the stack's skills write
@@ -255,7 +290,13 @@ don't need a project-level ignore.)
 command for the user to run:
 ```
 git add .claude/stack-config.json CLAUDE.md docs/ .gitignore
+# if cloud-session support was set up, also stage:
+git add .claude/settings.json .claude/hooks/cloud-bootstrap.sh .claude/skills/
 git commit -m "chore: stack init at tier <N>"
 ```
+
+The committed `.claude/skills/` portable-core set and `cloud-bootstrap.sh`
+are **shared, tracked files** (like `stack-config.json`) — the `.gitignore`
+block above ignores only runtime scratch, so these are not affected.
 
 After this, foreman is unlocked for the project (strict mode satisfied).

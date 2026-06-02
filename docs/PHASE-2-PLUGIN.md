@@ -55,6 +55,17 @@ If the plugin format makes any of these harder, push back on the format — main
 
 The plugin path is optional. If Anthropic's plugin ecosystem doesn't take off, or if the git-clone path remains best, stay there. Phase 2 is a distribution improvement, not a goal. Don't sacrifice the design to fit the format.
 
+## Relationship to cloud sessions
+
+Cloud sessions (web + iOS) are already handled by `scripts/cloud-bootstrap.sh`
+without a plugin — see `docs/CLOUD.md`. A plugin would *not* remove the
+session-start setup step in an ephemeral cloud container (you'd still install
+the plugin at boot, and a private marketplace needs the same token). When
+Phase 2 happens, the cloud story is a one-line swap in that setup script
+(`git clone … && install.sh` → `claude plugin install …`); the token handling,
+network-policy caveat, idempotency marker, and `/project-init` wiring carry
+over unchanged.
+
 ## Reference
 
 Check live before starting Phase 2:

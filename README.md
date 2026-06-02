@@ -50,6 +50,7 @@ parameterized; you bring your own accounts and fill in the placeholders:
 ## Documentation
 
 - `docs/PHILOSOPHY.md` — why this exists, what it optimizes for
+- `docs/CLOUD.md` — make custom skills/commands work in Claude Code cloud sessions (web + iOS)
 - `docs/ARCHITECTURE.md` — system architecture
 - `docs/ROUTING.md` — hook vs skill vs CLAUDE.md decision rule
 - `config/model-routing.json` — which model does what and why (rationale in `docs/ADRs/004-multi-provider-strategy.md`)
