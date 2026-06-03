@@ -54,6 +54,30 @@ one pull request per repo, idempotently (skips repos already current).
 - A `.claude/.stack-bootstrap-version` stamp lets it skip up-to-date repos and
   refresh stale ones.
 
+## Operating runbook
+
+Day-to-day tasks once it's live. All config edits are in `config.yml` on `main`;
+commit and the next run picks them up.
+
+| I want to… | Do this |
+|---|---|
+| **Enroll a new repo** | Add the topic `claude-stack` to it (repo → About ⚙ → Topics). It gets a PR on the next hourly run, or run the workflow manually to do it now. |
+| **Stop managing a repo** | Remove the `claude-stack` topic, **or** add its name to `exclude:` in `config.yml` (comma-separated). Already-merged bootstrap files stay until you delete them. |
+| **See what it *would* do (no writes)** | Actions → *Claude Stack reconcile* → Run workflow → leave **dry_run checked**. Read the log. |
+| **Run it now (open PRs)** | Same, but **uncheck dry_run**. (Scheduled runs are always live.) |
+| **Pause everything** | Set `enabled: false` in `config.yml`. The reconciler then only ever dry-runs — no PRs — until you set it back to `true`. |
+| **Push a stack update to all repos** | Nothing — when the stack repo advances, the version stamp differs, so the reconciler reopens/updates each repo's PR automatically. Just merge them. |
+| **Rotate the PAT** | Regenerate the fine-grained PAT (same perms: Contents RW, Pull requests RW, Metadata R, owner = the org, scoped to enrolled repos). Update the `STACK_RECONCILE_TOKEN` repo secret. Nothing else changes. |
+| **A run failed on the token** | The PAT expired, lost a permission, or doesn't cover a newly-tagged repo. Regenerate/extend it and update the secret. |
+
+**What runs automatically:** the hourly cron reconciles every tagged repo;
+new tags are picked up within the hour; merged PRs are skipped on later runs
+(idempotent via the `.claude/.stack-bootstrap-version` stamp).
+
+**Where things live:** scope/enable/exclude → `config.yml`; the token →
+repo secret `STACK_RECONCILE_TOKEN`; the logic → `scripts/reconcile.sh`;
+schedule/trigger → `.github/workflows/reconcile.yml`.
+
 ## Reference
 
 - Cloud distribution model + paths: <https://github.com/bschonbrun/claude-code-stack/blob/main/docs/CLOUD.md>
