@@ -5,6 +5,22 @@ All notable changes to the Claude Code Stack are documented here. Format follows
 ## [Unreleased]
 
 ### Added
+- **Org-wide cloud distribution (`/team-init` + reconciler Action)**: roll the
+  cloud bootstrap out across an entire GitHub org/team automatically, so every
+  existing **and** new repo gets it without per-repo work. Ships a per-org admin
+  repo template (`templates/team-admin/`) with a GitHub Action reconciler
+  (`scripts/reconcile.sh`) that runs hourly + on manual dispatch, enumerates
+  repos tagged with a GitHub topic (default `claude-stack`), and opens **one PR
+  per repo** that's missing or has a stale bootstrap (tracked by a
+  `.claude/.stack-bootstrap-version` stamp). No hosting — pure Actions. New
+  `/team-init` skill scaffolds the admin repo and captures org/topic/tier.
+  Safe-by-default: a `config.yml` `enabled: false` gate and dry-run default mean
+  nothing is written until an admin flips it and adds the `STACK_RECONCILE_TOKEN`
+  PAT. Deep-merges (never overwrites) an existing `.claude/settings.json`.
+  Installed via the Tier 0 manifest (+ smoke tests); offline unit test
+  `tests/test-reconcile.sh` (stubbed `gh`/`git`). Design in
+  `docs/ADRs/014-org-wide-cloud-distribution.md`. Not yet run against a live
+  org — dry-run + security review recommended before enabling writes.
 - **Cloud session support (web + iOS)**: the stack's personal/global
   skills/commands (`/goodmorning`, `/handoff`, …) now work in Claude Code
   *cloud* sessions, not just the Mac Desktop app. Cloud containers never sync a
