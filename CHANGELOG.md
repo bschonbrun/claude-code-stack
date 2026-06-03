@@ -5,6 +5,13 @@ All notable changes to the Claude Code Stack are documented here. Format follows
 ## [Unreleased]
 
 ### Added
+- **Reconciler auto-initializes repos (`stack-config.json`)**: the org reconciler
+  now also writes a default `.claude/stack-config.json` into each enrolled repo
+  (tier from the admin `config.yml`), so tagged repos are initialized for foreman
+  without a manual `/project-init`. Existing `stack-config.json` files are never
+  overwritten — repos someone already init'd keep their settings. Generated from
+  `templates/stack-config.template.json` (tier/created/last_modified/purpose
+  filled in). Covered by an offline assertion in `tests/test-reconcile.sh`.
 - **Org-wide cloud distribution (`/team-init` + reconciler Action)**: roll the
   cloud bootstrap out across an entire GitHub org/team automatically, so every
   existing **and** new repo gets it without per-repo work. Ships a per-org admin

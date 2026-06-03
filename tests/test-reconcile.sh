@@ -41,5 +41,17 @@ check "flags repos needing bootstrap" "needs bootstrap: repo-a"
 check "reports dry_run summary"      "dry_run=true"
 if grep -q "PR ready" <<<"$out"; then echo "  [FAIL] opened a PR in dry-run"; failures=$((failures+1)); else echo "  [PASS] no PR opened in dry-run"; fi
 
+# Default stack-config.json generation (the jq transform reconcile.sh runs).
+gen="$(jq --arg tier "2" --arg d "2026-06-03" \
+  '.stack_tier = (($tier | gsub("[^0-9]";"")) | tonumber)
+   | .created = $d | .last_modified = $d
+   | .purpose = "Auto-initialized by the Claude Code Stack org reconciler"' \
+  templates/stack-config.template.json 2>/dev/null)"
+if jq -e '.stack_tier == 2 and .created == "2026-06-03" and (.purpose | test("Auto-initialized"))' <<<"$gen" >/dev/null 2>&1; then
+  echo "  [PASS] generates valid default stack-config (tier as number)"
+else
+  echo "  [FAIL] stack-config generation"; failures=$((failures+1))
+fi
+
 [ "$failures" -gt 0 ] && { echo "FAILED: $failures"; exit 1; }
 echo "All reconcile tests passed."
