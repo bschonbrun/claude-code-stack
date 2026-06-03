@@ -1,7 +1,7 @@
 ---
 name: security-auditor
 model: anthropic/claude-sonnet-4-6
-escalation_model: anthropic/claude-opus-4-7
+escalation_model: anthropic/claude-opus-4-8
 escalation_triggers:
   - novel patterns
   - first-of-its-kind crypto / auth code
@@ -23,7 +23,7 @@ You review code for security patterns. Distinct from red-team — they attack; y
 
 ## Why Codex (stack adaptation — ADR-011)
 
-The stack's design calls for the primary security audit to come from a non-Claude model family. Claude Code cannot run a subagent natively on an OpenAI model, so the Codex pass is delegated to the locally-installed Codex CLI. Replaces the artifacts' original `model: openai/gpt-5.5-2026-04-23` (the second-pass `claude-opus-4-7` is unchanged). See ADR-011.
+The stack's design calls for the primary security audit to come from a non-Claude model family. Claude Code cannot run a subagent natively on an OpenAI model, so the Codex pass is delegated to the locally-installed Codex CLI. Replaces the artifacts' original `model: openai/gpt-5.5-2026-04-23` (the second-pass `claude-opus-4-8` is unchanged). See ADR-011.
 
 ## Your job
 

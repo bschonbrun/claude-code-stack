@@ -8,8 +8,8 @@
       "api_key_keychain": "anthropic-api-key",
       "base_url": "https://api.anthropic.com",
       "models": {
-        "claude-opus-4-7": {
-          "api_model_id": "claude-opus-4-7",
+        "claude-opus-4-8": {
+          "api_model_id": "claude-opus-4-8",
           "context_window": 1000000,
           "max_output": 128000,
           "supports_caching": true,
@@ -63,28 +63,28 @@
     }
   },
   "subagent_assignments": {
-    "architect": { "primary": "anthropic/claude-opus-4-7" },
-    "implementer": { "primary": "anthropic/claude-sonnet-4-6", "escalation": "anthropic/claude-opus-4-7" },
-    "validator": { "primary": "anthropic/claude-sonnet-4-6", "escalation": "anthropic/claude-opus-4-7" },
+    "architect": { "primary": "anthropic/claude-opus-4-8" },
+    "implementer": { "primary": "anthropic/claude-sonnet-4-6", "escalation": "anthropic/claude-opus-4-8" },
+    "validator": { "primary": "anthropic/claude-sonnet-4-6", "escalation": "anthropic/claude-opus-4-8" },
     "reviewer": { "primary": "codex/gpt-5.5", "orchestrated_by": "anthropic/claude-sonnet-4-6", "notes": "v1.1.1: adversarial review via local Codex CLI — see ADR-011." },
     "tester": { "primary": "anthropic/claude-sonnet-4-6" },
     "documenter": { "primary": "anthropic/claude-sonnet-4-6" },
     "scribe": { "primary": "anthropic/claude-haiku-4-5-20251001" },
     "ops": { "primary": "anthropic/claude-haiku-4-5-20251001", "escalation": "anthropic/claude-sonnet-4-6" },
     "product-critic": { "primary": "codex/gpt-5.5", "orchestrated_by": "anthropic/claude-sonnet-4-6", "notes": "v1.1.1: product critique via local Codex CLI — see ADR-011." },
-    "designer": { "primary": "anthropic/claude-opus-4-7" },
+    "designer": { "primary": "anthropic/claude-opus-4-8" },
     "red-team": { "primary": "gemini/gemini-2.5-pro", "orchestrated_by": "anthropic/claude-sonnet-4-6", "notes": "v1.1.1: red-team analysis via local Gemini CLI — see ADR-012." },
-    "security-auditor": { "primary": "codex/gpt-5.5", "second_pass": "anthropic/claude-opus-4-7", "orchestrated_by": "anthropic/claude-sonnet-4-6", "notes": "v1.1.1: primary audit via local Codex CLI; belt-and-suspenders Opus second pass on novel crypto/auth — see ADR-011." },
-    "performance-engineer": { "primary": "anthropic/claude-opus-4-7" },
-    "data-engineer": { "primary": "anthropic/claude-opus-4-7" },
+    "security-auditor": { "primary": "codex/gpt-5.5", "second_pass": "anthropic/claude-opus-4-8", "orchestrated_by": "anthropic/claude-sonnet-4-6", "notes": "v1.1.1: primary audit via local Codex CLI; belt-and-suspenders Opus second pass on novel crypto/auth — see ADR-011." },
+    "performance-engineer": { "primary": "anthropic/claude-opus-4-8" },
+    "data-engineer": { "primary": "anthropic/claude-opus-4-8" },
     "integration-specialist": { "primary": "anthropic/claude-sonnet-4-6" },
-    "incident-commander": { "primary": "anthropic/claude-opus-4-7" },
+    "incident-commander": { "primary": "anthropic/claude-opus-4-8" },
     "architecture-critic": { "primary": "gemini/gemini-2.5-pro", "orchestrated_by": "anthropic/claude-sonnet-4-6", "notes": "v1.1.1: whole-repo architectural critique via local Gemini CLI — see ADR-012." },
     "accessibility-auditor": { "primary": "anthropic/claude-sonnet-4-6" },
     "historian": { "primary": "gemini/gemini-2.5-pro", "orchestrated_by": "anthropic/claude-sonnet-4-6", "notes": "v1.1.1: long-context history review via local Gemini CLI — see ADR-012. Tier 4 subagent." },
     "librarian": { "primary": "anthropic/claude-haiku-4-5-20251001" },
     "estimator": { "primary": "anthropic/claude-sonnet-4-6" },
-    "foreman-team-lead": { "primary": "anthropic/claude-opus-4-7", "notes": "v1.1: Used in agent-teams orchestration mode only. Main-thread mode uses foreman as a skill — no subagent invocation." },
+    "foreman-team-lead": { "primary": "anthropic/claude-opus-4-8", "notes": "v1.1: Used in agent-teams orchestration mode only. Main-thread mode uses foreman as a skill — no subagent invocation." },
     "local-ops": { "primary": "ollama/qwen2.5-coder:32b", "notes": "Tier 5 local subagent. Model string must match an ollama tag that tier-installer.sh actually pulls and HARDWARE.md recommends — keep these three in sync." }
   },
   "notes": [

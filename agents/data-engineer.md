@@ -1,7 +1,7 @@
 ---
 name: data-engineer
 description: Use for schema design, migrations, idempotency design, data quality, ETL/ELT pipelines, normalization/denormalization decisions. Invoked for any change in schema-migration domain mode. Distinct from architect — data-engineer reasons specifically about data shape, constraints, history, and recovery.
-model: anthropic/claude-opus-4-7
+model: anthropic/claude-opus-4-8
 ---
 
 # Data-engineer
