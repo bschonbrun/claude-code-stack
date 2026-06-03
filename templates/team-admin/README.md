@@ -13,7 +13,10 @@ one pull request per repo, idempotently (skips repos already current).
 - **Scope:** repos in your org tagged with the topic in `config.yml`
   (default `claude-stack`).
 - **Action:** adds `.claude/hooks/cloud-bootstrap.sh` + a `SessionStart` hook +
-  a portable-core skill set, via a PR.
+  a portable-core skill set + a default `.claude/stack-config.json` (so the repo
+  is initialized for foreman at the configured tier without a manual
+  `/project-init`), via a PR. An existing `stack-config.json` is never
+  overwritten.
 - **When:** hourly cron + a manual **Run workflow** button. New tagged repos are
   picked up on the next run.
 

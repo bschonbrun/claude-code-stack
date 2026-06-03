@@ -107,6 +107,18 @@ for repo in "${REPOS[@]}"; do
     while IFS= read -r s; do
       [ -n "$s" ] && [ ! -d ".claude/skills/$s" ] && cp -r "$STACK_DIR/stack/skills/$s" ".claude/skills/$s"
     done < <(jq -r '.skills[]' "$STACK_DIR/stack/config/portable-core-skills.json")
+    # Default stack-config.json so the repo is initialized for foreman without a
+    # manual /project-init. Tier comes from the admin config. NEVER overwrite an
+    # existing one — a repo someone ran /project-init on keeps its own settings.
+    cfgtmpl="$STACK_DIR/stack/templates/stack-config.template.json"
+    if [ ! -f .claude/stack-config.json ] && [ -f "$cfgtmpl" ]; then
+      today="$(date +%F)"
+      jq --arg tier "$TIER" --arg d "$today" \
+        '.stack_tier = (($tier | gsub("[^0-9]";"")) | tonumber)
+         | .created = $d | .last_modified = $d
+         | .purpose = "Auto-initialized by the Claude Code Stack org reconciler"' \
+        "$cfgtmpl" > .claude/stack-config.json
+    fi
     echo "$VERSION" > .claude/.stack-bootstrap-version
     git add .claude
     git -c user.name='claude-stack-bot' -c user.email='claude-stack-bot@users.noreply.github.com' \
