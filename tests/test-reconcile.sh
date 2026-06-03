@@ -14,7 +14,7 @@ trap 'rm -rf "$STUBS"' EXIT
 cat > "$STUBS/git" <<'EOF'
 #!/usr/bin/env bash
 if [ "${1:-}" = "-C" ]; then shift 2; [ "${1:-}" = "rev-parse" ] && echo "abc1234"; exit 0; fi
-if [ "${1:-}" = "clone" ]; then mkdir -p "${!#}"; exit 0; fi
+if [ "${1:-}" = "clone" ]; then dest=""; for a in "$@"; do dest="$a"; done; mkdir -p "$dest"; exit 0; fi
 exit 0
 EOF
 cat > "$STUBS/gh" <<'EOF'

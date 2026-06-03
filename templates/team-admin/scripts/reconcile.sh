@@ -58,20 +58,25 @@ git clone --depth 1 "$STACK_REPO" "$STACK_DIR/stack" >/dev/null 2>&1 \
 VERSION="$(git -C "$STACK_DIR/stack" rev-parse --short HEAD)"
 log "stack version $VERSION; org=$ORG topic=$TOPIC tier=$TIER dry_run=$DRY_RUN"
 
-# In-scope repos: tagged with $topic, not archived.
-mapfile -t REPOS < <(gh search repos --owner "$ORG" --topic "$TOPIC" \
+# In-scope repos: tagged with $topic, not archived. (Portable read — macOS
+# ships bash 3.2, which has no `mapfile`.)
+REPOS=()
+while IFS= read -r _r; do
+  [ -n "$_r" ] && REPOS+=("$_r")
+done < <(gh search repos --owner "$ORG" --topic "$TOPIC" \
   --limit 1000 --json name --jq '.[].name' 2>/dev/null | sort -u)
 log "${#REPOS[@]} repo(s) tagged '$TOPIC'"
 
 is_excluded() { case ",${EXCLUDE// /}," in *",$1,"*) return 0 ;; esac; return 1; }
 
 changed=0 skipped=0 failed=0
+[ "${#REPOS[@]}" -eq 0 ] && { log "no repos in scope; nothing to do."; exit 0; }
 for repo in "${REPOS[@]}"; do
   [ -z "$repo" ] && continue
   if is_excluded "$repo"; then log "skip $repo (excluded)"; skipped=$((skipped + 1)); continue; fi
 
   remote_ver="$(gh api "repos/$ORG/$repo/contents/.claude/.stack-bootstrap-version" \
-    --jq '.content' 2>/dev/null | base64 -d 2>/dev/null | tr -d '[:space:]' || true)"
+    --jq '.content' 2>/dev/null | base64 --decode 2>/dev/null | tr -d '[:space:]' || true)"
   if [ "$remote_ver" = "$VERSION" ]; then
     log "ok $repo (current)"; skipped=$((skipped + 1)); continue
   fi
