@@ -1,0 +1,23 @@
+# Claude Code Stack — org reconciler config
+#
+# The reconciler adds the cloud bootstrap to every repo in `org` tagged with
+# the GitHub topic `topic`. It opens one pull request per repo. Idempotent.
+
+# SAFETY GATE: stays in dry-run (no PRs) until you set this to true.
+enabled: false
+
+# Your GitHub org (or user) that owns the repos.
+org: your-org
+
+# Only repos tagged with this GitHub topic are in scope. Add the topic to a
+# repo (Repo → About → ⚙ → Topics) to opt it in.
+topic: claude-stack
+
+# Stack tier the cloud bootstrap installs (0-5).
+tier: 2
+
+# Branch the reconciler pushes the bootstrap PR to.
+branch: chore/claude-stack-bootstrap
+
+# Comma-separated repo names to skip even if tagged. Example: legacy,sandbox
+exclude:
