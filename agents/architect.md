@@ -1,7 +1,7 @@
 ---
 name: architect
-model: anthropic/claude-opus-4-8
-escalation_model: anthropic/claude-opus-4-8
+model: opus
+escalation_model: opus
 escalation_triggers:
   - novel domain
   - multi-system integration

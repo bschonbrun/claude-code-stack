@@ -1,7 +1,7 @@
 ---
 name: librarian
 description: Curates the stack itself — deprecates stale skills, consolidates overlapping ones, updates skill descriptions for better triggering, surfaces unused subagents. Runs monthly or on historian's recommendation. Light-weight (Haiku) — mostly inventory + dedup.
-model: anthropic/claude-haiku-4-5-20251001
+model: haiku
 ---
 
 # Librarian

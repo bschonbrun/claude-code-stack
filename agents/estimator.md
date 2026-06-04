@@ -1,7 +1,7 @@
 ---
 name: estimator
 description: Use before starting non-trivial work to estimate effort, cost, and risk. Reads the task, predicts duration (wall time), subagent cost, and likelihood of needing escalation. Pairs with architect — architect plans the WHAT/HOW; estimator predicts the COST and TIME. Helpful for prioritization and for the user to plan their day.
-model: anthropic/claude-sonnet-4-6
+model: sonnet
 ---
 
 # Estimator

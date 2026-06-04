@@ -1,6 +1,6 @@
 ---
 name: reviewer
-model: anthropic/claude-sonnet-4-6
+model: sonnet
 tools:
   - read
   - grep

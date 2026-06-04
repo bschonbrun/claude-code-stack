@@ -1,6 +1,6 @@
 ---
 name: foreman-team-lead
-model: anthropic/claude-opus-4-8
+model: opus
 description: Team-lead subagent for Anthropic's Agent Teams orchestration mode. Used ONLY when stack-config.json has orchestration_mode=agent-teams or hybrid. Coordinates teammates via Agent Teams' peer-to-peer messaging. Routing logic identical to /foreman skill — this subagent reads /foreman SKILL.md as its primary directive.
 ---
 

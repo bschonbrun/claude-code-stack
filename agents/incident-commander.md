@@ -1,7 +1,7 @@
 ---
 name: incident-commander
 description: Use when production is broken. Owns diagnosis flow, communication, decision-making under pressure, postmortem authoring. Distinct from ops (which handles routine operational work) — incident-commander is for emergencies. Runs on Opus because high-stakes, novel situations need maximum reasoning.
-model: anthropic/claude-opus-4-8
+model: opus
 ---
 
 # Incident-commander

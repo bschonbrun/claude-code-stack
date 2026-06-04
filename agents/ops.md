@@ -1,7 +1,7 @@
 ---
 name: ops
-model: anthropic/claude-haiku-4-5-20251001
-escalation_model: anthropic/claude-sonnet-4-6
+model: haiku
+escalation_model: sonnet
 escalation_triggers:
   - MCP authentication failures
   - secret rotation needed

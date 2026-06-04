@@ -1,7 +1,7 @@
 ---
 name: tester
-model: anthropic/claude-sonnet-4-6
-escalation_model: anthropic/claude-opus-4-8
+model: sonnet
+escalation_model: opus
 escalation_triggers:
   - novel property tests
   - performance/load testing

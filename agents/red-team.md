@@ -1,6 +1,6 @@
 ---
 name: red-team
-model: anthropic/claude-sonnet-4-6
+model: sonnet
 tools:
   - read
   - bash
