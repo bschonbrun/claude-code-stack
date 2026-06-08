@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Write a handoff doc to .claude/next_prompt.md so the next Claude Code session can resume cleanly. Captures branch state, what shipped this session, what's blocked, exact next steps, and gotchas (env/auth/sandbox). The SessionStart hook reads this file at the start of the next session. Also archives a copy to docs/handoffs/<date>.md for long-term reference and cross-repo work.
+description: Write a handoff doc to .claude/next_prompt.md so the next Claude Code session can resume cleanly. Captures branch state, what shipped this session, what's blocked, exact next steps, and gotchas (env/auth/sandbox). The SessionStart hook reads this file at the start of the next session. Also archives a copy to docs/handoffs/<date>.md, then commits + pushes BOTH files to the default branch so cloud / fresh-clone sessions can resume via /goodmorning (not just the machine that wrote it).
 ---
 
 # /handoff
@@ -13,9 +13,10 @@ Run at the end of a working session. Writes `.claude/next_prompt.md` (the "live"
 - `mkdir -p .claude`
 - `mkdir -p docs/handoffs`
 
-### 2. Gitignore the live handoff (one-time per project)
-- Check `.gitignore` for `.claude/next_prompt.md`. If absent, append it.
-- Rationale: the live handoff is session-private; the archive in `docs/handoffs/` is committed.
+### 2. Ensure the live handoff is TRACKED (not gitignored)
+- Both files must reach Git so a cloud / fresh-clone session can find the handoff via `/goodmorning` — not just the machine that wrote it.
+- If `.gitignore` contains `.claude/next_prompt.md`, **remove that line** (older versions of this skill ignored it).
+- The live handoff is not secret, but Step 6 scans it before committing — never commit credentials.
 
 ### 3. Gather state
 - `git branch --show-current`
@@ -79,7 +80,21 @@ _Written: <YYYY-MM-DD HH:MM PT>_
 - Write to `.claude/next_prompt.md` (overwrites previous).
 - Write to `docs/handoffs/$(date +%Y-%m-%d-%H%M).md` (new file each session).
 
-### 6. Confirm
-- Print absolute paths of both files.
+### 6. Commit + push both files to Git (so cloud/fresh sessions can find them)
+
+The handoff is useless to another environment if it only lives on this machine.
+Always land BOTH files on the **default branch** (`main`/`master`) — the next
+`/goodmorning` pulls from there, not from a feature branch.
+
+1. **Secrets scan — refuse on hit.** Grep both files for `secret|password|token|api[_-]?key|service_role|bearer|ey[A-Za-z0-9_-]{20,}`. If anything matches, do NOT commit — surface it and ask the user to scrub first.
+2. **Stage + commit:** `git add .claude/next_prompt.md docs/handoffs/<file>.md` then commit (`docs(handoff): <YYYY-MM-DD> session handoff + archive`).
+3. **Get it onto the default branch:**
+   - Try a direct push: `git push origin HEAD:<default>` only if you're on `<default>` and it's not protected.
+   - Otherwise (you're on a feature branch, or push is rejected by branch protection): create `chore/handoff-<YYYY-MM-DD-HHMM>` off `origin/<default>`, move the two files onto it, commit, push, and `gh pr create --base <default>`. Repos with auto-merge land it on green; otherwise tell the user to merge it.
+   - If there's no remote / no `gh`: commit locally and tell the user it's local-only (cloud won't see it until pushed).
+4. Don't let session work-in-progress ride along — commit ONLY the two handoff files.
+
+### 7. Confirm
+- Print absolute paths of both files + the branch/PR they landed on (and merge state).
 - Print first 5 lines of each as sanity check.
 - Stop. Do not run further commands.
