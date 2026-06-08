@@ -71,19 +71,29 @@ gh api -X PATCH repos/OWNER/REPO -f allow_auto_merge=true -f allow_squash_merge=
 
 Create a ruleset named `auto-merge-required-checks` on the default branch requiring the `run-tests` check. This sits beside the org-level `main-branch-protection` ruleset (rulesets compose; required checks from all matching rulesets apply).
 
+Send a **JSON body via stdin** — `gh`'s `-f`/`-F` flags cannot build the nested `rules[].parameters.required_status_checks[]` array and return HTTP 422:
+
 ```
-DB=$(gh api repos/OWNER/REPO --jq '.default_branch')
-gh api -X POST repos/OWNER/REPO/rulesets \
-  -f name='auto-merge-required-checks' \
-  -f target='branch' \
-  -f enforcement='active' \
-  -F 'conditions[ref_name][include][]=~DEFAULT_BRANCH' \
-  -F 'rules[][type]=required_status_checks' \
-  -F 'rules[][parameters][strict_required_status_checks_policy]=true' \
-  -F 'rules[][parameters][required_status_checks][][context]=run-tests'
+gh api -X POST repos/OWNER/REPO/rulesets --input - <<'JSON'
+{
+  "name": "auto-merge-required-checks",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": { "ref_name": { "include": ["~DEFAULT_BRANCH"], "exclude": [] } },
+  "rules": [
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": true,
+        "required_status_checks": [ { "context": "run-tests" } ]
+      }
+    }
+  ]
+}
+JSON
 ```
 
-If a ruleset named `auto-merge-required-checks` already exists, PATCH it (`gh api -X PUT repos/OWNER/REPO/rulesets/<id> ...`) instead of creating a duplicate.
+If a ruleset named `auto-merge-required-checks` already exists, PUT it (`gh api -X PUT repos/OWNER/REPO/rulesets/<id> --input -`) instead of creating a duplicate.
 
 `~DEFAULT_BRANCH` is GitHub's literal token for "the repo's default branch" — pass it verbatim.
 
